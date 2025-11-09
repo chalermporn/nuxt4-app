@@ -10,7 +10,7 @@
         </label>
         <div class="flex items-center gap-2">
           <div class="avatar placeholder">
-            <div class="bg-primary text-primary-content rounded-lg w-10">
+            <div class="bg-primary text-primary-content rounded-lg w-9 flex items-center justify-center">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
@@ -31,12 +31,12 @@
         <div class="dropdown dropdown-end">
           <label tabindex="0" class="btn btn-ghost btn-circle avatar">
             <div class="avatar placeholder">
-              <div class="bg-primary text-primary-content rounded-full w-10">
+              <div class="bg-primary text-primary-content rounded-full w-9 flex items-center justify-center">
                 <span class="text-sm">{{ user?.name?.charAt(0).toUpperCase() }}</span>
               </div>
             </div>
           </label>
-          <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+          <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-1 p-2 shadow bg-base-100 rounded-box w-52">
             <li class="menu-title">
               <span>{{ user?.name }}</span>
             </li>
@@ -106,7 +106,7 @@
       <!-- Stats -->
       <div v-if="canManageUsers && !loading" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <!-- Total Users Card -->
-        <div class="relative bg-gradient-to-br from-primary/10 to-primary/5 rounded-2xl p-6 border border-primary/20 overflow-hidden group hover:shadow-lg transition-all duration-300">
+        <div class="relative bg-linear-to-br from-primary/10 to-primary/5 rounded-2xl p-6 border border-primary/20 overflow-hidden group hover:shadow-lg transition-all duration-300">
           <div class="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform duration-500"></div>
           <div class="relative flex items-start justify-between">
             <div>
@@ -123,7 +123,7 @@
         </div>
 
         <!-- Admins Card -->
-        <div class="relative bg-gradient-to-br from-error/10 to-error/5 rounded-2xl p-6 border border-error/20 overflow-hidden group hover:shadow-lg transition-all duration-300">
+        <div class="relative bg-linear-to-br from-error/10 to-error/5 rounded-2xl p-6 border border-error/20 overflow-hidden group hover:shadow-lg transition-all duration-300">
           <div class="absolute top-0 right-0 w-32 h-32 bg-error/10 rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform duration-500"></div>
           <div class="relative flex items-start justify-between">
             <div>
@@ -140,7 +140,7 @@
         </div>
 
         <!-- Moderators Card -->
-        <div class="relative bg-gradient-to-br from-warning/10 to-warning/5 rounded-2xl p-6 border border-warning/20 overflow-hidden group hover:shadow-lg transition-all duration-300">
+        <div class="relative bg-linear-to-br from-warning/10 to-warning/5 rounded-2xl p-6 border border-warning/20 overflow-hidden group hover:shadow-lg transition-all duration-300">
           <div class="absolute top-0 right-0 w-32 h-32 bg-warning/10 rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform duration-500"></div>
           <div class="relative flex items-start justify-between">
             <div>
@@ -162,7 +162,7 @@
         <div class="p-8">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <div>
-              <h2 class="text-3xl font-bold mb-2 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">User Management</h2>
+              <h2 class="text-3xl font-bold mb-2 bg-linear-to-r from-primary to-secondary bg-clip-text text-transparent">User Management</h2>
               <p class="text-sm text-base-content/60">Manage your team members and permissions</p>
             </div>
             <button
@@ -202,7 +202,7 @@
                   <td>
                     <div class="flex items-center gap-3">
                       <div class="avatar placeholder">
-                        <div class="bg-gradient-to-br from-primary to-secondary text-primary-content rounded-full w-10 shadow-md">
+                        <div class="bg-linear-to-br from-primary to-secondary text-primary-content rounded-full w-10 shadow-md flex items-center justify-center">
                           <span class="text-xs font-semibold">{{ u.name?.charAt(0).toUpperCase() }}</span>
                         </div>
                       </div>
@@ -257,7 +257,7 @@
       <!-- No Permission Message -->
       <div v-else class="bg-base-100 rounded-2xl shadow-xl border border-base-300/50 overflow-hidden">
         <div class="text-center py-20 px-8">
-          <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-error/20 to-warning/20 rounded-full flex items-center justify-center">
+          <div class="w-24 h-24 mx-auto mb-6 bg-linear-to-br from-error/20 to-warning/20 rounded-full flex items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
@@ -305,13 +305,13 @@
             class="relative w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden bg-white backdrop-blur-md border border-base-300/30"
           >
             <!-- Gradient Header -->
-            <div class="relative bg-gradient-to-br from-primary to-secondary p-8 text-primary-content overflow-hidden">
+            <div class="relative bg-linear-to-br from-primary to-secondary p-8 text-primary-content overflow-hidden">
               <!-- Decorative circles -->
               <div class="absolute -top-8 -right-8 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
               <div class="absolute -bottom-4 -left-4 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
 
               <div class="relative flex items-start gap-4">
-                <div class="flex-shrink-0 w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center shadow-lg">
+                <div class="shrink-0 w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center shadow-lg">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
@@ -323,7 +323,7 @@
                 <button
                   @click="closeModal"
                   type="button"
-                  class="flex-shrink-0 w-8 h-8 rounded-lg hover:bg-white/20 transition-colors flex items-center justify-center"
+                  class="shrink-0 w-8 h-8 rounded-lg hover:bg-white/20 transition-colors flex items-center justify-center"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
