@@ -1,6 +1,7 @@
 import { db } from '../db';
 import { users } from '../db/schema';
 import { hash } from 'bcrypt';
+import { eq, or } from 'drizzle-orm';
 
 const SALT_ROUNDS = 10;
 
@@ -8,6 +9,16 @@ async function seed() {
   console.log('🌱 Seeding database...');
 
   try {
+    // Delete existing seed users to make script idempotent
+    await db.delete(users).where(
+      or(
+        eq(users.email, 'admin@example.com'),
+        eq(users.email, 'mod@example.com'),
+        eq(users.email, 'user@example.com')
+      )
+    );
+    console.log('🧹 Cleaned up existing seed users');
+
     // Create admin user
     const adminPassword = await hash('admin123', SALT_ROUNDS);
     await db.insert(users).values({
