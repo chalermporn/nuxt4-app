@@ -1,0 +1,18 @@
+{
+    "css.lint.unknownAtRules": "ignore",
+    "css.customData": [
+        ".vscode/css-custom-data.json"
+    ],
+    "files.associations": {
+        "*.css": "css",
+        "*.vue": "vue"
+    },
+    "editor.quickSuggestions": {
+        "strings": true
+    },
+    "[vue]": {
+        "editor.defaultFormatter": "Vue.volar"
+    },
+    "scss.lint.unknownAtRules": "ignore",
+    "less.lint.unknownAtRules": "ignore"
+}
