@@ -1,8 +1,8 @@
 import { Elysia } from 'elysia';
-import { swagger } from '@elysiajs/swagger';
+import { openapi } from '@elysiajs/openapi';
 import { cors } from '@elysiajs/cors';
-import { authRoutes } from './server/api/auth';
-import { usersRoutes } from './server/api/users';
+import { authRoutes } from './elysia/api/auth.ts';
+import { usersRoutes } from './elysia/api/users.ts';
 
 // Create Elysia app
 export const app = new Elysia()
@@ -11,7 +11,7 @@ export const app = new Elysia()
     credentials: true,
   }))
   .use(
-    swagger({
+    openapi({
       documentation: {
         info: {
           title: 'Nuxt 4 + Elysia API',
@@ -29,7 +29,7 @@ export const app = new Elysia()
     message: 'Welcome to Nuxt 4 + Elysia API',
     version: '1.0.0',
     endpoints: {
-      docs: '/swagger',
+      docs: '/openapi',
       auth: '/api/auth',
       users: '/api/users',
     },
@@ -55,7 +55,7 @@ export const app = new Elysia()
 if (import.meta.main) {
   app.listen(3001, () => {
     console.log('🚀 Elysia API is running on http://localhost:3001');
-    console.log('📚 API Documentation: http://localhost:3001/swagger');
+    console.log('📚 API Documentation: http://localhost:3001/openapi');
   });
 }
 
