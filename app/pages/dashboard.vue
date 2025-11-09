@@ -128,7 +128,7 @@
           <div class="relative flex items-start justify-between">
             <div>
               <p class="text-sm font-medium text-base-content/60 mb-2">Admins</p>
-              <h3 class="text-4xl font-bold text-error mb-1">{{ users.filter(u => u.role === 'admin').length }}</h3>
+              <h3 class="text-4xl font-bold text-error mb-1">{{ users.filter((u: { role: string; }) => u.role === 'admin').length }}</h3>
               <p class="text-xs text-base-content/50">Full access</p>
             </div>
             <div class="w-12 h-12 bg-error/20 rounded-xl flex items-center justify-center">
@@ -145,7 +145,7 @@
           <div class="relative flex items-start justify-between">
             <div>
               <p class="text-sm font-medium text-base-content/60 mb-2">Moderators</p>
-              <h3 class="text-4xl font-bold text-warning mb-1">{{ users.filter(u => u.role === 'moderator').length }}</h3>
+              <h3 class="text-4xl font-bold text-warning mb-1">{{ users.filter((u: { role: string; }) => u.role === 'moderator').length }}</h3>
               <p class="text-xs text-base-content/50">Can view users</p>
             </div>
             <div class="w-12 h-12 bg-warning/20 rounded-xl flex items-center justify-center">
@@ -464,6 +464,8 @@
 </template>
 
 <script setup lang="ts">
+import { useAuth } from '~/composables/useAuth';
+
 const router = useRouter();
 const { user, isAuthenticated, logout, fetchWithAuth, initAuth } = useAuth();
 

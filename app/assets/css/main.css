@@ -1,11 +1,11 @@
 @import "tailwindcss";
 @plugin "daisyui" {
-  themes: ['light'];
-  darkTheme: false;
+  /* themes: ['light']; */
+  /* darkTheme: false;
   base: true;
   styled: true;
   utils: true;
   prefix: '';
   logs: true;
-  themeRoot: ':root';
+  themeRoot: ':root'; */
 }
