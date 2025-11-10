@@ -227,6 +227,10 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({
+  layout: 'login'
+});
+
 const router = useRouter();
 const { login, register, isAuthenticated } = useAuth();
 
