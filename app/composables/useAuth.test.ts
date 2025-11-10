@@ -31,12 +31,12 @@ globalThis.readonly = mockReadonly as any;
 
 // Mock $fetch
 const mockFetch = vi.fn();
-vi.stubGlobal('$fetch', mockFetch);
+globalThis.$fetch = mockFetch as any;
 
 // Mock process.client
-vi.stubGlobal('process', {
+globalThis.process = {
   client: true,
-});
+} as any;
 
 // Mock localStorage
 const localStorageMock = (() => {
@@ -54,7 +54,7 @@ const localStorageMock = (() => {
     },
   };
 })();
-vi.stubGlobal('localStorage', localStorageMock);
+globalThis.localStorage = localStorageMock as any;
 
 describe('useAuth', () => {
   let useAuth: () => ReturnType<typeof import('./useAuth').useAuth>;
@@ -420,6 +420,25 @@ describe('useAuth', () => {
       // Should have logged out
       expect(mockUser.value).toBeNull();
       expect(mockAccessToken.value).toBeNull();
+    });
+
+    it('should throw error for non-401 errors without retry', async () => {
+      mockAccessToken.value = 'access-token-123';
+
+      // Request fails with non-401 error (e.g., 500)
+      mockFetch.mockRejectedValueOnce({
+        status: 500,
+        message: 'Internal Server Error',
+      });
+
+      const auth = useAuth();
+
+      await expect(
+        auth.fetchWithAuth('http://localhost/api/test')
+      ).rejects.toEqual({
+        status: 500,
+        message: 'Internal Server Error',
+      });
     });
   });
 

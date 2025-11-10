@@ -7,12 +7,13 @@ import { jwtConfig, authMiddleware, requireRole } from '../middleware/auth';
 
 const SALT_ROUNDS = 10;
 
-export const usersRoutes = new Elysia({ prefix: '/users' })
+// Routes accessible by admin and moderator
+const adminModeratorRoutes = new Elysia()
   .use(jwtConfig)
-  
-  // Get all users (Admin and Moderator only)
   .use(authMiddleware)
   .use(requireRole(['admin', 'moderator']))
+
+  // Get all users (Admin and Moderator only)
   .get('/', async ({ user }) => {
     try {
       const allUsers = await db
@@ -63,10 +64,15 @@ export const usersRoutes = new Elysia({ prefix: '/users' })
         id: t.String(),
       }),
     }
-  )
+  );
+
+// Routes accessible by admin only
+const adminOnlyRoutes = new Elysia()
+  .use(jwtConfig)
+  .use(authMiddleware)
+  .use(requireRole(['admin']))
 
   // Create new user (Admin only)
-  .use(requireRole(['admin']))
   .post(
     '/',
     async ({ body, set }) => {
@@ -235,3 +241,8 @@ export const usersRoutes = new Elysia({ prefix: '/users' })
       }),
     }
   );
+
+// Combine all routes
+export const usersRoutes = new Elysia({ prefix: '/users' })
+  .use(adminModeratorRoutes)
+  .use(adminOnlyRoutes);

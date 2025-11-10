@@ -125,6 +125,11 @@ describe('Users API', () => {
         })
       );
 
+      if (response.status !== 200) {
+        const errorData = await response.json();
+        console.error('Moderator access failed:', response.status, errorData);
+      }
+
       expect(response.status).toBe(200);
       const data = await response.json();
       expect(data).toHaveProperty('users');
@@ -294,6 +299,25 @@ describe('Users API', () => {
       const data = await response.json();
 
       expect(data.user.name).toBe('Updated Admin');
+      expect(data.message).toBe('User updated successfully');
+    });
+
+    it('should allow admin to update user password', async () => {
+      const response = await app.handle(
+        new Request(`http://localhost/users/${adminUserId}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${adminToken}`,
+          },
+          body: JSON.stringify({
+            password: 'newpassword123',
+          }),
+        })
+      );
+
+      expect(response.status).toBe(200);
+      const data = await response.json();
       expect(data.message).toBe('User updated successfully');
     });
 

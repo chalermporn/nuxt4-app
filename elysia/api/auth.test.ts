@@ -137,6 +137,11 @@ describe('Auth API', () => {
         })
       );
 
+      if (response.status !== 200) {
+        const errorData = await response.json();
+        console.error('Login failed:', response.status, errorData);
+      }
+
       expect(response.status).toBe(200);
       const data = await response.json();
 
@@ -235,6 +240,78 @@ describe('Auth API', () => {
       expect(response.status).toBe(401);
       const data = await response.json();
       expect(data.error).toContain('Invalid');
+    });
+
+    it('should reject expired refresh token', async () => {
+      // Create a valid JWT and store it with an expired date
+      const response = await app.handle(
+        new Request('http://localhost/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: 'expired@example.com',
+            password: 'password123',
+            name: 'Expired User',
+          }),
+        })
+      );
+
+      const { refreshToken: validToken, user } = await response.json();
+
+      // Update the token to be expired
+      await db
+        .update(refreshTokens)
+        .set({ expiresAt: new Date(Date.now() - 1000) })
+        .where(eq(refreshTokens.token, validToken));
+
+      const refreshResponse = await app.handle(
+        new Request('http://localhost/auth/refresh', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            refreshToken: validToken,
+          }),
+        })
+      );
+
+      expect(refreshResponse.status).toBe(401);
+      const data = await refreshResponse.json();
+      expect(data.error).toContain('expired');
+    });
+
+    it('should reject refresh token when user is deleted', async () => {
+      // Create a user and get their refresh token
+      const response = await app.handle(
+        new Request('http://localhost/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: 'deleted@example.com',
+            password: 'password123',
+            name: 'Deleted User',
+          }),
+        })
+      );
+
+      const { refreshToken: validToken, user: createdUser } = await response.json();
+
+      // Delete the user but keep the refresh token
+      await db.delete(users).where(eq(users.id, createdUser.id));
+
+      // Try to refresh with the orphaned token
+      const refreshResponse = await app.handle(
+        new Request('http://localhost/auth/refresh', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            refreshToken: validToken,
+          }),
+        })
+      );
+
+      expect(refreshResponse.status).toBe(401);
+      const data = await refreshResponse.json();
+      expect(data.error).toContain('User not found');
     });
   });
 

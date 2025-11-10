@@ -50,6 +50,7 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
         const refreshToken = await jwt.sign({
           userId: newUser.id,
           type: 'refresh',
+          iat: Date.now(), // Add timestamp to make token unique
         });
 
         // Store refresh token
@@ -115,7 +116,11 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
         const refreshToken = await jwt.sign({
           userId: user.id,
           type: 'refresh',
+          iat: Date.now(), // Add timestamp to make token unique
         });
+
+        // Delete any existing refresh tokens for this user
+        await db.delete(refreshTokens).where(eq(refreshTokens.userId, user.id));
 
         // Store refresh token
         await db.insert(refreshTokens).values({
@@ -135,6 +140,7 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
           refreshToken,
         };
       } catch (error) {
+        console.error('Login error:', error);
         set.status = 500;
         return { error: 'Login failed' };
       }
