@@ -1,16 +1,14 @@
 import { Elysia } from 'elysia';
 import { jwt } from '@elysiajs/jwt';
+import { config } from '../../config/env';
 
-// JWT Secret - ควรเก็บใน environment variable
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
-
-// JWT configuration
+// JWT configuration using environment variables
 export const jwtConfig = new Elysia()
   .use(
     jwt({
       name: 'jwt',
-      secret: JWT_SECRET,
-      exp: '15m', // Access token expires in 15 minutes
+      secret: config.jwt.secret,
+      exp: config.jwt.accessTokenExpiry,
     })
   );
 

@@ -3,18 +3,19 @@ import { openapi } from '@elysiajs/openapi';
 import { cors } from '@elysiajs/cors';
 import { authRoutes } from './elysia/api/auth.ts';
 import { usersRoutes } from './elysia/api/users.ts';
+import { config } from './config/env';
 
 // Create Elysia app
 export const app = new Elysia()
   .use(cors({
-    origin: 'http://localhost:3000',
+    origin: config.cors.origin,
     credentials: true,
   }))
   .use(
     openapi({
       documentation: {
         info: {
-          title: 'Nuxt 4 + Elysia API',
+          title: config.appName,
           version: '1.0.0',
           description: 'REST API with JWT authentication and RBAC',
         },
@@ -26,8 +27,9 @@ export const app = new Elysia()
     })
   )
   .get('/', () => ({
-    message: 'Welcome to Nuxt 4 + Elysia API',
+    message: `Welcome to ${config.appName} API`,
     version: '1.0.0',
+    environment: config.nodeEnv,
     endpoints: {
       docs: '/openapi',
       auth: '/api/auth',
@@ -45,17 +47,28 @@ export const app = new Elysia()
       return { error: 'Route not found' };
     }
 
-    console.error('Error:', error);
+    // Only log detailed errors in development
+    if (config.isDevelopment()) {
+      console.error('Error:', error);
+    }
+
     return {
-      error: error.message || 'Internal server error',
+      error: config.isDevelopment()
+        ? error.message || 'Internal server error'
+        : 'Internal server error',
     };
   });
 
 // Start server if running directly
 if (import.meta.main) {
-  app.listen(3001, () => {
-    console.log('🚀 Elysia API is running on http://localhost:3001');
-    console.log('📚 API Documentation: http://localhost:3001/openapi');
+  const port = config.api.port;
+  const host = config.api.host;
+
+  app.listen(port, () => {
+    console.log(`\n🚀 ${config.appName} API`);
+    console.log(`   Environment: ${config.nodeEnv}`);
+    console.log(`   Running on: http://${host}:${port}`);
+    console.log(`   Documentation: http://${host}:${port}/openapi\n`);
   });
 }
 

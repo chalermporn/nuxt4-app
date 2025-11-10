@@ -20,6 +20,16 @@ logs
 
 # Local env files
 .env
-.env.*
+.env.local
+.env.development
+.env.uat
+.env.production
 !.env.example
+
+# Test coverage
 coverage
+
+# Database files
+*.db
+*.db-shm
+*.db-wal
