@@ -1,6 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import type { User } from './useAuth';
 
+// Mock console.error to suppress error messages in test output
+vi.spyOn(console, 'error').mockImplementation(() => {});
+
 // Mock Nuxt composables
 const mockUser = { value: null as User | null };
 const mockAccessToken = { value: null as string | null };
@@ -25,9 +28,9 @@ const mockComputed = vi.fn((fn: () => any) => {
 const mockReadonly = vi.fn((ref) => ref);
 
 // Set up global mocks
-globalThis.useState = mockUseState as any;
-globalThis.computed = mockComputed as any;
-globalThis.readonly = mockReadonly as any;
+(globalThis as any).useState = mockUseState;
+(globalThis as any).computed = mockComputed;
+(globalThis as any).readonly = mockReadonly;
 
 // Mock $fetch
 const mockFetch = vi.fn();
