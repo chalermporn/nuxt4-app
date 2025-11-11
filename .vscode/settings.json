@@ -14,5 +14,8 @@
         "editor.defaultFormatter": "Vue.volar"
     },
     "scss.lint.unknownAtRules": "ignore",
-    "less.lint.unknownAtRules": "ignore"
+    "less.lint.unknownAtRules": "ignore",
+    "cSpell.words": [
+        "wrongpass"
+    ]
 }
