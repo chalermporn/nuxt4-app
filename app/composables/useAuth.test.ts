@@ -10,11 +10,14 @@ const mockAccessToken = { value: null as string | null };
 const mockRefreshToken = { value: null as string | null };
 
 // Create mock functions
-const mockUseState = vi.fn((key: string, init: () => any) => {
+const mockUseState = vi.fn((key: string, init?: () => any) => {
+  // Call the initializer to ensure it's covered
+  if (init) init();
+
   if (key === 'auth-user') return mockUser;
   if (key === 'auth-access-token') return mockAccessToken;
   if (key === 'auth-refresh-token') return mockRefreshToken;
-  return { value: init() };
+  return { value: init ? init() : null };
 });
 
 const mockComputed = vi.fn((fn: () => any) => {
@@ -69,6 +72,11 @@ describe('useAuth', () => {
     mockUser.value = null;
     mockAccessToken.value = null;
     mockRefreshToken.value = null;
+
+    // Reset process.client to default (true)
+    globalThis.process = {
+      client: true,
+    } as any;
 
     // Import fresh instance
     const module = await import('./useAuth');
@@ -125,6 +133,16 @@ describe('useAuth', () => {
         auth.login('wrong@example.com', 'wrongpass')
       ).rejects.toThrow('Invalid credentials');
     });
+
+    it('should throw generic error on login failure without error message', async () => {
+      mockFetch.mockRejectedValueOnce({});
+
+      const auth = useAuth();
+
+      await expect(
+        auth.login('wrong@example.com', 'wrongpass')
+      ).rejects.toThrow('Login failed');
+    });
   });
 
   describe('register', () => {
@@ -175,6 +193,16 @@ describe('useAuth', () => {
       await expect(
         auth.register('existing@example.com', 'password123', 'Test User')
       ).rejects.toThrow('User already exists');
+    });
+
+    it('should throw generic error on registration failure without error message', async () => {
+      mockFetch.mockRejectedValueOnce({});
+
+      const auth = useAuth();
+
+      await expect(
+        auth.register('test@example.com', 'password123', 'Test User')
+      ).rejects.toThrow('Registration failed');
     });
   });
 
@@ -237,6 +265,21 @@ describe('useAuth', () => {
       const auth = useAuth();
 
       await expect(auth.refresh()).rejects.toThrow();
+
+      // Should have cleared state
+      expect(mockUser.value).toBeNull();
+      expect(mockAccessToken.value).toBeNull();
+      expect(mockRefreshToken.value).toBeNull();
+    });
+
+    it('should throw generic error on refresh failure without error message', async () => {
+      mockRefreshToken.value = 'refresh-token-123';
+
+      mockFetch.mockRejectedValueOnce({});
+
+      const auth = useAuth();
+
+      await expect(auth.refresh()).rejects.toThrow('Token refresh failed');
 
       // Should have cleared state
       expect(mockUser.value).toBeNull();
@@ -478,6 +521,141 @@ describe('useAuth', () => {
 
       const auth = useAuth();
       expect(auth.isAuthenticated.value).toBe(false);
+    });
+  });
+
+  describe('readonly properties', () => {
+    it('should return readonly user property', () => {
+      const testUser = {
+        id: 1,
+        email: 'test@example.com',
+        name: 'Test User',
+        role: 'user',
+      };
+      mockUser.value = testUser;
+
+      const auth = useAuth();
+      expect(auth.user.value).toEqual(testUser);
+    });
+
+    it('should return readonly accessToken property', () => {
+      mockAccessToken.value = 'test-token-123';
+
+      const auth = useAuth();
+      expect(auth.accessToken.value).toBe('test-token-123');
+    });
+  });
+
+  describe('Server-side (process.client = false)', () => {
+    beforeEach(() => {
+      globalThis.process = {
+        client: false,
+      } as any;
+    });
+
+    it('should login without localStorage on server', async () => {
+      const mockResponse = {
+        user: {
+          id: 1,
+          email: 'test@example.com',
+          name: 'Test User',
+          role: 'user',
+        },
+        accessToken: 'access-token-123',
+        refreshToken: 'refresh-token-123',
+      };
+
+      mockFetch.mockResolvedValueOnce(mockResponse);
+
+      const auth = useAuth();
+      const result = await auth.login('test@example.com', 'password123');
+
+      expect(result).toEqual(mockResponse);
+      expect(mockUser.value).toEqual(mockResponse.user);
+      expect(mockAccessToken.value).toBe('access-token-123');
+      expect(mockRefreshToken.value).toBe('refresh-token-123');
+    });
+
+    it('should register without localStorage on server', async () => {
+      const mockResponse = {
+        user: {
+          id: 1,
+          email: 'new@example.com',
+          name: 'New User',
+          role: 'user',
+        },
+        accessToken: 'access-token-123',
+        refreshToken: 'refresh-token-123',
+      };
+
+      mockFetch.mockResolvedValueOnce(mockResponse);
+
+      const auth = useAuth();
+      const result = await auth.register('new@example.com', 'password123', 'New User');
+
+      expect(result).toEqual(mockResponse);
+      expect(mockUser.value).toEqual(mockResponse.user);
+    });
+
+    it('should refresh without localStorage on server', async () => {
+      mockRefreshToken.value = 'refresh-token-123';
+
+      const mockResponse = {
+        accessToken: 'new-access-token',
+        user: {
+          id: 1,
+          email: 'test@example.com',
+          name: 'Test User',
+          role: 'user',
+        },
+      };
+
+      mockFetch.mockResolvedValueOnce(mockResponse);
+
+      const auth = useAuth();
+      const result = await auth.refresh();
+
+      expect(result).toEqual(mockResponse);
+      expect(mockAccessToken.value).toBe('new-access-token');
+    });
+
+    it('should logout without localStorage on server', async () => {
+      mockUser.value = {
+        id: 1,
+        email: 'test@example.com',
+        name: 'Test User',
+        role: 'user',
+      };
+      mockAccessToken.value = 'access-token-123';
+      mockRefreshToken.value = 'refresh-token-123';
+
+      mockFetch.mockResolvedValueOnce({ message: 'Logged out' });
+
+      const auth = useAuth();
+      await auth.logout();
+
+      expect(mockUser.value).toBeNull();
+      expect(mockAccessToken.value).toBeNull();
+      expect(mockRefreshToken.value).toBeNull();
+    });
+
+    it('should not initialize from localStorage on server', () => {
+      localStorageMock.setItem('accessToken', 'access-token-123');
+      localStorageMock.setItem('refreshToken', 'refresh-token-123');
+      localStorageMock.setItem('user', JSON.stringify({
+        id: 1,
+        email: 'test@example.com',
+        name: 'Test User',
+        role: 'user',
+      }));
+
+      const auth = useAuth();
+      auth.initAuth();
+
+      // Should not load from localStorage on server
+      expect(mockAccessToken.value).toBeNull();
+      expect(mockRefreshToken.value).toBeNull();
+      expect(mockUser.value).toBeNull();
     });
   });
 });
