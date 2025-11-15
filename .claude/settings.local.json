@@ -5,7 +5,11 @@
       "Bash(bun run:*)",
       "Bash(tree:*)",
       "Bash(bun test:*)",
-      "Bash(NODE_ENV=test bun run:*)"
+      "Bash(NODE_ENV=test bun run:*)",
+      "Bash(curl:*)",
+      "Bash(sqlite3:*)",
+      "Bash(lsof:*)",
+      "Bash(xargs kill:*)"
     ],
     "deny": [],
     "ask": []

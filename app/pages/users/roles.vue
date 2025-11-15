@@ -311,8 +311,303 @@
       </div>
     </div>
 
-    <!-- Placeholder modals - These would contain forms for creating/editing roles and permissions -->
-    <!-- For brevity, I'm showing simplified modals. In production, these would have full forms -->
+    <!-- Create Role Modal -->
+    <Teleport to="body">
+      <dialog :open="showCreateRoleModal" class="modal modal-open" v-if="showCreateRoleModal">
+        <div class="modal-box max-w-md">
+          <h3 class="font-bold text-lg mb-4">Create New Role</h3>
+          <form @submit.prevent="handleCreateRole">
+            <div class="form-control mb-4">
+              <label class="label">
+                <span class="label-text">Role Name</span>
+              </label>
+              <input
+                v-model="newRole.name"
+                type="text"
+                placeholder="e.g., editor"
+                class="input input-bordered"
+                required
+              />
+            </div>
+            <div class="form-control mb-6">
+              <label class="label">
+                <span class="label-text">Description</span>
+              </label>
+              <textarea
+                v-model="newRole.description"
+                placeholder="Describe the role's purpose"
+                class="textarea textarea-bordered"
+                rows="3"
+              ></textarea>
+            </div>
+            <div class="modal-action">
+              <button
+                type="button"
+                @click="showCreateRoleModal = false; resetNewRole()"
+                class="btn btn-ghost"
+              >
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-primary" :disabled="loading">
+                <span v-if="loading" class="loading loading-spinner loading-sm"></span>
+                Create Role
+              </button>
+            </div>
+          </form>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+          <button @click="showCreateRoleModal = false; resetNewRole()">close</button>
+        </form>
+      </dialog>
+    </Teleport>
+
+    <!-- Edit Role Modal -->
+    <Teleport to="body">
+      <dialog :open="showEditRoleModal" class="modal modal-open" v-if="showEditRoleModal">
+        <div class="modal-box max-w-md">
+          <h3 class="font-bold text-lg mb-4">Edit Role</h3>
+          <form @submit.prevent="handleUpdateRole">
+            <div class="form-control mb-4">
+              <label class="label">
+                <span class="label-text">Role Name</span>
+              </label>
+              <input
+                v-model="editingRole.name"
+                type="text"
+                placeholder="e.g., editor"
+                class="input input-bordered"
+                required
+              />
+            </div>
+            <div class="form-control mb-6">
+              <label class="label">
+                <span class="label-text">Description</span>
+              </label>
+              <textarea
+                v-model="editingRole.description"
+                placeholder="Describe the role's purpose"
+                class="textarea textarea-bordered"
+                rows="3"
+              ></textarea>
+            </div>
+            <div class="modal-action">
+              <button
+                type="button"
+                @click="showEditRoleModal = false; resetEditingRole()"
+                class="btn btn-ghost"
+              >
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-primary" :disabled="loading">
+                <span v-if="loading" class="loading loading-spinner loading-sm"></span>
+                Update Role
+              </button>
+            </div>
+          </form>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+          <button @click="showEditRoleModal = false; resetEditingRole()">close</button>
+        </form>
+      </dialog>
+    </Teleport>
+
+    <!-- Create Permission Modal -->
+    <Teleport to="body">
+      <dialog :open="showCreatePermissionModal" class="modal modal-open" v-if="showCreatePermissionModal">
+        <div class="modal-box max-w-md">
+          <h3 class="font-bold text-lg mb-4">Create New Permission</h3>
+          <form @submit.prevent="handleCreatePermission">
+            <div class="form-control mb-4">
+              <label class="label">
+                <span class="label-text">Resource</span>
+              </label>
+              <input
+                v-model="newPermission.resource"
+                type="text"
+                placeholder="e.g., posts"
+                class="input input-bordered"
+                required
+              />
+            </div>
+            <div class="form-control mb-4">
+              <label class="label">
+                <span class="label-text">Action</span>
+              </label>
+              <input
+                v-model="newPermission.action"
+                type="text"
+                placeholder="e.g., create"
+                class="input input-bordered"
+                required
+              />
+            </div>
+            <div class="form-control mb-4">
+              <label class="label">
+                <span class="label-text">Name (auto-generated from resource:action)</span>
+              </label>
+              <input
+                :value="newPermission.resource && newPermission.action ? `${newPermission.resource}:${newPermission.action}` : ''"
+                type="text"
+                class="input input-bordered"
+                disabled
+              />
+            </div>
+            <div class="form-control mb-6">
+              <label class="label">
+                <span class="label-text">Description</span>
+              </label>
+              <textarea
+                v-model="newPermission.description"
+                placeholder="Describe what this permission allows"
+                class="textarea textarea-bordered"
+                rows="3"
+              ></textarea>
+            </div>
+            <div class="modal-action">
+              <button
+                type="button"
+                @click="showCreatePermissionModal = false; resetNewPermission()"
+                class="btn btn-ghost"
+              >
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-primary" :disabled="loading || !newPermission.resource || !newPermission.action">
+                <span v-if="loading" class="loading loading-spinner loading-sm"></span>
+                Create Permission
+              </button>
+            </div>
+          </form>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+          <button @click="showCreatePermissionModal = false; resetNewPermission()">close</button>
+        </form>
+      </dialog>
+    </Teleport>
+
+    <!-- Edit Permission Modal -->
+    <Teleport to="body">
+      <dialog :open="showEditPermissionModal" class="modal modal-open" v-if="showEditPermissionModal">
+        <div class="modal-box max-w-md">
+          <h3 class="font-bold text-lg mb-4">Edit Permission</h3>
+          <form @submit.prevent="handleUpdatePermission">
+            <div class="form-control mb-4">
+              <label class="label">
+                <span class="label-text">Resource</span>
+              </label>
+              <input
+                v-model="editingPermission.resource"
+                type="text"
+                placeholder="e.g., posts"
+                class="input input-bordered"
+                required
+              />
+            </div>
+            <div class="form-control mb-4">
+              <label class="label">
+                <span class="label-text">Action</span>
+              </label>
+              <input
+                v-model="editingPermission.action"
+                type="text"
+                placeholder="e.g., create"
+                class="input input-bordered"
+                required
+              />
+            </div>
+            <div class="form-control mb-4">
+              <label class="label">
+                <span class="label-text">Name</span>
+              </label>
+              <input
+                v-model="editingPermission.name"
+                type="text"
+                class="input input-bordered"
+                required
+              />
+            </div>
+            <div class="form-control mb-6">
+              <label class="label">
+                <span class="label-text">Description</span>
+              </label>
+              <textarea
+                v-model="editingPermission.description"
+                placeholder="Describe what this permission allows"
+                class="textarea textarea-bordered"
+                rows="3"
+              ></textarea>
+            </div>
+            <div class="modal-action">
+              <button
+                type="button"
+                @click="showEditPermissionModal = false; resetEditingPermission()"
+                class="btn btn-ghost"
+              >
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-primary" :disabled="loading">
+                <span v-if="loading" class="loading loading-spinner loading-sm"></span>
+                Update Permission
+              </button>
+            </div>
+          </form>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+          <button @click="showEditPermissionModal = false; resetEditingPermission()">close</button>
+        </form>
+      </dialog>
+    </Teleport>
+
+    <!-- Manage Role Permissions Modal -->
+    <Teleport to="body">
+      <dialog :open="showManagePermissionsModal" class="modal modal-open" v-if="showManagePermissionsModal">
+        <div class="modal-box max-w-2xl">
+          <h3 class="font-bold text-lg mb-4">Manage Permissions for {{ managingRole?.name }}</h3>
+          <div class="mb-6">
+            <p class="text-sm text-base-content/60 mb-4">Select permissions to assign to this role</p>
+            <div class="max-h-96 overflow-y-auto">
+              <div v-for="permission in permissions" :key="permission.id" class="form-control">
+                <label class="label cursor-pointer justify-start gap-4">
+                  <input
+                    type="checkbox"
+                    :checked="selectedPermissionIds.includes(permission.id)"
+                    @change="togglePermission(permission.id)"
+                    class="checkbox checkbox-primary"
+                  />
+                  <div class="flex-1">
+                    <div class="font-semibold">{{ permission.name }}</div>
+                    <div class="text-sm text-base-content/60">{{ permission.description || 'No description' }}</div>
+                    <div class="flex gap-2 mt-1">
+                      <div class="badge badge-outline badge-sm">{{ permission.resource }}</div>
+                      <div class="badge badge-ghost badge-sm">{{ permission.action }}</div>
+                    </div>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="modal-action">
+            <button
+              type="button"
+              @click="showManagePermissionsModal = false; resetManagingRole()"
+              class="btn btn-ghost"
+            >
+              Cancel
+            </button>
+            <button
+              @click="handleUpdateRolePermissions"
+              class="btn btn-primary"
+              :disabled="loading"
+            >
+              <span v-if="loading" class="loading loading-spinner loading-sm"></span>
+              Save Permissions
+            </button>
+          </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+          <button @click="showManagePermissionsModal = false; resetManagingRole()">close</button>
+        </form>
+      </dialog>
+    </Teleport>
   </div>
 </template>
 
@@ -323,45 +618,54 @@ definePageMeta({
   layout: 'dashboard'
 });
 
+const API_BASE = 'http://localhost:3001/api';
+
 const router = useRouter();
-const { user, isAuthenticated, initAuth } = useAuth();
+const { user, isAuthenticated, initAuth, fetchWithAuth } = useAuth();
 
 const activeTab = ref('roles');
 const error = ref('');
 const success = ref('');
 const showCreateRoleModal = ref(false);
+const showEditRoleModal = ref(false);
 const showCreatePermissionModal = ref(false);
+const showEditPermissionModal = ref(false);
+const showManagePermissionsModal = ref(false);
+const loading = ref(false);
 
-// Mock data - In production, this would come from an API
-const roles = ref([
-  { id: 1, name: 'admin', description: 'Full system access with all permissions', createdAt: new Date() },
-  { id: 2, name: 'moderator', description: 'Can view and manage users', createdAt: new Date() },
-  { id: 3, name: 'user', description: 'Standard user access', createdAt: new Date() },
-]);
+interface Role {
+  id: number;
+  name: string;
+  description: string | null;
+  createdAt: Date | string;
+  updatedAt?: Date | string;
+}
 
-const permissions = ref([
-  { id: 1, name: 'users:create', resource: 'users', action: 'create', description: 'Create new users' },
-  { id: 2, name: 'users:read', resource: 'users', action: 'read', description: 'View user information' },
-  { id: 3, name: 'users:update', resource: 'users', action: 'update', description: 'Update user information' },
-  { id: 4, name: 'users:delete', resource: 'users', action: 'delete', description: 'Delete users' },
-  { id: 5, name: 'roles:create', resource: 'roles', action: 'create', description: 'Create new roles' },
-  { id: 6, name: 'roles:read', resource: 'roles', action: 'read', description: 'View roles' },
-  { id: 7, name: 'roles:update', resource: 'roles', action: 'update', description: 'Update roles' },
-  { id: 8, name: 'roles:delete', resource: 'roles', action: 'delete', description: 'Delete roles' },
-]);
+interface Permission {
+  id: number;
+  name: string;
+  resource: string;
+  action: string;
+  description: string | null;
+  createdAt: Date | string;
+}
 
-const rolePermissions = ref([
-  { roleId: 1, permissionId: 1 },
-  { roleId: 1, permissionId: 2 },
-  { roleId: 1, permissionId: 3 },
-  { roleId: 1, permissionId: 4 },
-  { roleId: 1, permissionId: 5 },
-  { roleId: 1, permissionId: 6 },
-  { roleId: 1, permissionId: 7 },
-  { roleId: 1, permissionId: 8 },
-  { roleId: 2, permissionId: 2 },
-  { roleId: 2, permissionId: 3 },
-]);
+interface RolePermission {
+  roleId: number;
+  permissionId: number;
+}
+
+const roles = ref<Role[]>([]);
+const permissions = ref<Permission[]>([]);
+const rolePermissions = ref<{ [roleId: number]: Permission[] }>({});
+
+// Form data
+const newRole = ref({ name: '', description: '' });
+const editingRole = ref<Partial<Role> & { id?: number }>({ name: '', description: '' });
+const newPermission = ref({ resource: '', action: '', description: '' });
+const editingPermission = ref<Partial<Permission> & { id?: number }>({ name: '', resource: '', action: '', description: '' });
+const managingRole = ref<Role | null>(null);
+const selectedPermissionIds = ref<number[]>([]);
 
 const isAdmin = computed(() => {
   return user.value?.role === 'admin';
@@ -372,7 +676,7 @@ const uniqueResources = computed(() => {
 });
 
 const getRolePermissionCount = (roleId: number) => {
-  return rolePermissions.value.filter(rp => rp.roleId === roleId).length;
+  return rolePermissions.value[roleId]?.length || 0;
 };
 
 const formatDate = (date: any) => {
@@ -384,31 +688,253 @@ const formatDate = (date: any) => {
   });
 };
 
-const editRole = (role: any) => {
-  // TODO: Implement edit role functionality
-  console.log('Edit role:', role);
+// Fetch roles from API
+const fetchRoles = async () => {
+  try {
+    loading.value = true;
+    const response = await fetchWithAuth<{ roles: Role[] }>(`${API_BASE}/rbac/roles`);
+    roles.value = response.roles;
+
+    // Fetch permissions for each role
+    for (const role of roles.value) {
+      await fetchRolePermissions(role.id);
+    }
+  } catch (err: any) {
+    error.value = err.message || 'Failed to fetch roles';
+    setTimeout(() => error.value = '', 5000);
+  } finally {
+    loading.value = false;
+  }
 };
 
-const deleteRole = (roleId: number) => {
+// Fetch permissions from API
+const fetchPermissions = async () => {
+  try {
+    loading.value = true;
+    const response = await fetchWithAuth<{ permissions: Permission[] }>(`${API_BASE}/rbac/permissions`);
+    permissions.value = response.permissions;
+  } catch (err: any) {
+    error.value = err.message || 'Failed to fetch permissions';
+    setTimeout(() => error.value = '', 5000);
+  } finally {
+    loading.value = false;
+  }
+};
+
+// Fetch permissions for a specific role
+const fetchRolePermissions = async (roleId: number) => {
+  try {
+    const response = await fetchWithAuth<{ permissions: Permission[] }>(`${API_BASE}/rbac/roles/${roleId}/permissions`);
+    rolePermissions.value[roleId] = response.permissions;
+  } catch (err: any) {
+    console.error(`Failed to fetch permissions for role ${roleId}:`, err);
+  }
+};
+
+// Reset functions
+const resetNewRole = () => {
+  newRole.value = { name: '', description: '' };
+};
+
+const resetEditingRole = () => {
+  editingRole.value = { name: '', description: '' };
+};
+
+const resetNewPermission = () => {
+  newPermission.value = { resource: '', action: '', description: '' };
+};
+
+const resetEditingPermission = () => {
+  editingPermission.value = { name: '', resource: '', action: '', description: '' };
+};
+
+const resetManagingRole = () => {
+  managingRole.value = null;
+  selectedPermissionIds.value = [];
+};
+
+// Role CRUD operations
+const handleCreateRole = async () => {
+  try {
+    loading.value = true;
+    await fetchWithAuth(`${API_BASE}/rbac/roles`, {
+      method: 'POST',
+      body: newRole.value,
+    });
+    success.value = 'Role created successfully';
+    setTimeout(() => success.value = '', 5000);
+    showCreateRoleModal.value = false;
+    resetNewRole();
+    await fetchRoles();
+  } catch (err: any) {
+    error.value = err.data?.error || 'Failed to create role';
+    setTimeout(() => error.value = '', 5000);
+  } finally {
+    loading.value = false;
+  }
+};
+
+const editRole = (role: Role) => {
+  editingRole.value = { ...role };
+  showEditRoleModal.value = true;
+};
+
+const handleUpdateRole = async () => {
+  if (!editingRole.value.id) return;
+
+  try {
+    loading.value = true;
+    await fetchWithAuth(`${API_BASE}/rbac/roles/${editingRole.value.id}`, {
+      method: 'PATCH',
+      body: {
+        name: editingRole.value.name,
+        description: editingRole.value.description,
+      },
+    });
+    success.value = 'Role updated successfully';
+    setTimeout(() => success.value = '', 5000);
+    showEditRoleModal.value = false;
+    resetEditingRole();
+    await fetchRoles();
+  } catch (err: any) {
+    error.value = err.data?.error || 'Failed to update role';
+    setTimeout(() => error.value = '', 5000);
+  } finally {
+    loading.value = false;
+  }
+};
+
+const deleteRole = async (roleId: number) => {
   if (!confirm('Are you sure you want to delete this role?')) return;
-  // TODO: Implement delete role functionality
-  console.log('Delete role:', roleId);
+
+  try {
+    await fetchWithAuth(`${API_BASE}/rbac/roles/${roleId}`, {
+      method: 'DELETE',
+    });
+    success.value = 'Role deleted successfully';
+    setTimeout(() => success.value = '', 5000);
+    await fetchRoles();
+  } catch (err: any) {
+    error.value = err.data?.error || 'Failed to delete role';
+    setTimeout(() => error.value = '', 5000);
+  }
 };
 
-const manageRolePermissions = (role: any) => {
-  // TODO: Implement manage role permissions functionality
-  console.log('Manage permissions for role:', role);
+// Permission CRUD operations
+const handleCreatePermission = async () => {
+  try {
+    loading.value = true;
+    const name = `${newPermission.value.resource}:${newPermission.value.action}`;
+    await fetchWithAuth(`${API_BASE}/rbac/permissions`, {
+      method: 'POST',
+      body: {
+        name,
+        resource: newPermission.value.resource,
+        action: newPermission.value.action,
+        description: newPermission.value.description,
+      },
+    });
+    success.value = 'Permission created successfully';
+    setTimeout(() => success.value = '', 5000);
+    showCreatePermissionModal.value = false;
+    resetNewPermission();
+    await fetchPermissions();
+  } catch (err: any) {
+    error.value = err.data?.error || 'Failed to create permission';
+    setTimeout(() => error.value = '', 5000);
+  } finally {
+    loading.value = false;
+  }
 };
 
-const editPermission = (permission: any) => {
-  // TODO: Implement edit permission functionality
-  console.log('Edit permission:', permission);
+const editPermission = (permission: Permission) => {
+  editingPermission.value = { ...permission };
+  showEditPermissionModal.value = true;
 };
 
-const deletePermission = (permissionId: number) => {
+const handleUpdatePermission = async () => {
+  if (!editingPermission.value.id) return;
+
+  try {
+    loading.value = true;
+    await fetchWithAuth(`${API_BASE}/rbac/permissions/${editingPermission.value.id}`, {
+      method: 'PATCH',
+      body: {
+        name: editingPermission.value.name,
+        resource: editingPermission.value.resource,
+        action: editingPermission.value.action,
+        description: editingPermission.value.description,
+      },
+    });
+    success.value = 'Permission updated successfully';
+    setTimeout(() => success.value = '', 5000);
+    showEditPermissionModal.value = false;
+    resetEditingPermission();
+    await fetchPermissions();
+  } catch (err: any) {
+    error.value = err.data?.error || 'Failed to update permission';
+    setTimeout(() => error.value = '', 5000);
+  } finally {
+    loading.value = false;
+  }
+};
+
+// Role permissions management
+const manageRolePermissions = async (role: Role) => {
+  managingRole.value = role;
+  // Get current permissions for this role
+  const currentPerms = rolePermissions.value[role.id] || [];
+  selectedPermissionIds.value = currentPerms.map(p => p.id);
+  showManagePermissionsModal.value = true;
+};
+
+const togglePermission = (permissionId: number) => {
+  const index = selectedPermissionIds.value.indexOf(permissionId);
+  if (index > -1) {
+    selectedPermissionIds.value.splice(index, 1);
+  } else {
+    selectedPermissionIds.value.push(permissionId);
+  }
+};
+
+const handleUpdateRolePermissions = async () => {
+  if (!managingRole.value) return;
+
+  try {
+    loading.value = true;
+    await fetchWithAuth(`${API_BASE}/rbac/roles/${managingRole.value.id}/permissions`, {
+      method: 'PUT',
+      body: {
+        permissionIds: selectedPermissionIds.value,
+      },
+    });
+    success.value = 'Role permissions updated successfully';
+    setTimeout(() => success.value = '', 5000);
+    showManagePermissionsModal.value = false;
+    await fetchRolePermissions(managingRole.value.id);
+    resetManagingRole();
+  } catch (err: any) {
+    error.value = err.data?.error || 'Failed to update role permissions';
+    setTimeout(() => error.value = '', 5000);
+  } finally {
+    loading.value = false;
+  }
+};
+
+const deletePermission = async (permissionId: number) => {
   if (!confirm('Are you sure you want to delete this permission?')) return;
-  // TODO: Implement delete permission functionality
-  console.log('Delete permission:', permissionId);
+
+  try {
+    await fetchWithAuth(`${API_BASE}/rbac/permissions/${permissionId}`, {
+      method: 'DELETE',
+    });
+    success.value = 'Permission deleted successfully';
+    setTimeout(() => success.value = '', 5000);
+    await fetchPermissions();
+  } catch (err: any) {
+    error.value = err.data?.error || 'Failed to delete permission';
+    setTimeout(() => error.value = '', 5000);
+  }
 };
 
 // Redirect if not authenticated
@@ -418,8 +944,11 @@ watchEffect(() => {
   }
 });
 
-// Initialize auth on mount
-onMounted(() => {
+// Initialize auth and fetch data on mount
+onMounted(async () => {
   initAuth();
+  if (isAuthenticated.value && isAdmin.value) {
+    await Promise.all([fetchRoles(), fetchPermissions()]);
+  }
 });
 </script>

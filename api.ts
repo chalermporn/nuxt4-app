@@ -3,6 +3,7 @@ import { openapi } from '@elysiajs/openapi';
 import { cors } from '@elysiajs/cors';
 import { authRoutes } from './elysia/api/auth.ts';
 import { usersRoutes } from './elysia/api/users.ts';
+import { rolesRoutes } from './elysia/api/roles.ts';
 import { config } from './config/env';
 
 // Create Elysia app
@@ -22,6 +23,7 @@ export const app = new Elysia()
         tags: [
           { name: 'Auth', description: 'Authentication endpoints' },
           { name: 'Users', description: 'User management endpoints (CRUD)' },
+          { name: 'RBAC', description: 'Role-based access control endpoints' },
         ],
       },
     })
@@ -34,12 +36,14 @@ export const app = new Elysia()
       docs: '/openapi',
       auth: '/api/auth',
       users: '/api/users',
+      rbac: '/api/rbac',
     },
   }))
   .group('/api', (app) =>
     app
       .use(authRoutes)
       .use(usersRoutes)
+      .use(rolesRoutes)
   )
   .onError(({ code, error, set }) => {
     if (code === 'NOT_FOUND') {

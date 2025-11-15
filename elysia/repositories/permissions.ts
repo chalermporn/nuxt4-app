@@ -166,3 +166,199 @@ export async function getRoleWithPermissions(roleName: string) {
     permissions: perms,
   };
 }
+
+/**
+ * Get role by ID
+ */
+export async function getRoleById(id: number) {
+  const result = await db.select().from(roles).where(eq(roles.id, id)).limit(1);
+  return result[0] || null;
+}
+
+/**
+ * Create a new role
+ */
+export async function createRole(name: string, description?: string) {
+  // Check if role already exists
+  const existing = await getRoleByName(name);
+  if (existing) {
+    throw new Error(`Role '${name}' already exists`);
+  }
+
+  const [newRole] = await db
+    .insert(roles)
+    .values({
+      name,
+      description,
+    })
+    .returning();
+
+  return newRole;
+}
+
+/**
+ * Update a role
+ */
+export async function updateRole(id: number, data: { name?: string; description?: string }) {
+  const existing = await getRoleById(id);
+  if (!existing) {
+    throw new Error(`Role with ID ${id} not found`);
+  }
+
+  // If updating name, check for conflicts
+  if (data.name && data.name !== existing.name) {
+    const conflict = await getRoleByName(data.name);
+    if (conflict) {
+      throw new Error(`Role '${data.name}' already exists`);
+    }
+  }
+
+  const updateData: any = { updatedAt: new Date() };
+  if (data.name) updateData.name = data.name;
+  if (data.description !== undefined) updateData.description = data.description;
+
+  const [updatedRole] = await db
+    .update(roles)
+    .set(updateData)
+    .where(eq(roles.id, id))
+    .returning();
+
+  return updatedRole;
+}
+
+/**
+ * Delete a role
+ */
+export async function deleteRole(id: number) {
+  const existing = await getRoleById(id);
+  if (!existing) {
+    throw new Error(`Role with ID ${id} not found`);
+  }
+
+  await db.delete(roles).where(eq(roles.id, id));
+  return { message: 'Role deleted successfully' };
+}
+
+/**
+ * Get permission by ID
+ */
+export async function getPermissionById(id: number) {
+  const result = await db.select().from(permissions).where(eq(permissions.id, id)).limit(1);
+  return result[0] || null;
+}
+
+/**
+ * Create a new permission
+ */
+export async function createPermission(
+  name: string,
+  resource: string,
+  action: string,
+  description?: string
+) {
+  // Check if permission already exists
+  const existing = await getPermissionByName(name);
+  if (existing) {
+    throw new Error(`Permission '${name}' already exists`);
+  }
+
+  const [newPermission] = await db
+    .insert(permissions)
+    .values({
+      name,
+      resource,
+      action,
+      description,
+    })
+    .returning();
+
+  return newPermission;
+}
+
+/**
+ * Update a permission
+ */
+export async function updatePermission(
+  id: number,
+  data: { name?: string; resource?: string; action?: string; description?: string }
+) {
+  const existing = await getPermissionById(id);
+  if (!existing) {
+    throw new Error(`Permission with ID ${id} not found`);
+  }
+
+  // If updating name, check for conflicts
+  if (data.name && data.name !== existing.name) {
+    const conflict = await getPermissionByName(data.name);
+    if (conflict) {
+      throw new Error(`Permission '${data.name}' already exists`);
+    }
+  }
+
+  const updateData: any = {};
+  if (data.name) updateData.name = data.name;
+  if (data.resource) updateData.resource = data.resource;
+  if (data.action) updateData.action = data.action;
+  if (data.description !== undefined) updateData.description = data.description;
+
+  const [updatedPermission] = await db
+    .update(permissions)
+    .set(updateData)
+    .where(eq(permissions.id, id))
+    .returning();
+
+  return updatedPermission;
+}
+
+/**
+ * Delete a permission
+ */
+export async function deletePermission(id: number) {
+  const existing = await getPermissionById(id);
+  if (!existing) {
+    throw new Error(`Permission with ID ${id} not found`);
+  }
+
+  await db.delete(permissions).where(eq(permissions.id, id));
+  return { message: 'Permission deleted successfully' };
+}
+
+/**
+ * Get all permissions for a role by role ID
+ */
+export async function getRolePermissionsById(roleId: number) {
+  const result = await db
+    .select({
+      permission: permissions,
+    })
+    .from(rolePermissions)
+    .innerJoin(permissions, eq(rolePermissions.permissionId, permissions.id))
+    .where(eq(rolePermissions.roleId, roleId));
+
+  return result.map((r) => r.permission);
+}
+
+/**
+ * Set permissions for a role (replaces all existing permissions)
+ */
+export async function setRolePermissions(roleId: number, permissionIds: number[]) {
+  const role = await getRoleById(roleId);
+  if (!role) {
+    throw new Error(`Role with ID ${roleId} not found`);
+  }
+
+  // Delete existing permissions
+  await db.delete(rolePermissions).where(eq(rolePermissions.roleId, roleId));
+
+  // Insert new permissions
+  if (permissionIds.length > 0) {
+    await db.insert(rolePermissions).values(
+      permissionIds.map((permissionId) => ({
+        roleId,
+        permissionId,
+      }))
+    );
+  }
+
+  return { message: 'Role permissions updated successfully' };
+}
