@@ -4,7 +4,7 @@
  */
 
 import { db } from '../db';
-import { users, refreshTokens } from '../db/schema';
+import { users, refreshTokens, roles, permissions, rolePermissions } from '../db/schema';
 import { sql } from 'drizzle-orm';
 import { config } from '../config/env';
 
@@ -14,18 +14,21 @@ async function migrate() {
 
   try {
     // Check if tables exist by trying to count
-    try {
-      await db.select().from(users).limit(1);
-      console.log('✅ Users table exists');
-    } catch {
-      console.log('⚠️  Users table does not exist, will be created');
-    }
+    const tablesToCheck = [
+      { name: 'users', table: users },
+      { name: 'refresh_tokens', table: refreshTokens },
+      { name: 'roles', table: roles },
+      { name: 'permissions', table: permissions },
+      { name: 'role_permissions', table: rolePermissions },
+    ];
 
-    try {
-      await db.select().from(refreshTokens).limit(1);
-      console.log('✅ Refresh tokens table exists');
-    } catch {
-      console.log('⚠️  Refresh tokens table does not exist, will be created');
+    for (const { name, table } of tablesToCheck) {
+      try {
+        await db.select().from(table).limit(1);
+        console.log(`✅ ${name} table exists`);
+      } catch {
+        console.log(`⚠️  ${name} table does not exist, will be created`);
+      }
     }
 
     // Create tables using raw SQL if needed
@@ -36,8 +39,8 @@ async function migrate() {
         password TEXT NOT NULL,
         name TEXT NOT NULL,
         role TEXT DEFAULT 'user' NOT NULL,
-        created_at INTEGER DEFAULT (unixepoch()) NOT NULL,
-        updated_at INTEGER DEFAULT (unixepoch()) NOT NULL
+        created_at INTEGER DEFAULT (strftime('%s', 'now')) NOT NULL,
+        updated_at INTEGER DEFAULT (strftime('%s', 'now')) NOT NULL
       )
     `);
 
@@ -47,8 +50,40 @@ async function migrate() {
         user_id INTEGER NOT NULL,
         token TEXT NOT NULL UNIQUE,
         expires_at INTEGER NOT NULL,
-        created_at INTEGER DEFAULT (unixepoch()) NOT NULL,
+        created_at INTEGER DEFAULT (strftime('%s', 'now')) NOT NULL,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `);
+
+    await db.run(sql`
+      CREATE TABLE IF NOT EXISTS roles (
+        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+        name TEXT NOT NULL UNIQUE,
+        description TEXT,
+        created_at INTEGER DEFAULT (strftime('%s', 'now')) NOT NULL,
+        updated_at INTEGER DEFAULT (strftime('%s', 'now')) NOT NULL
+      )
+    `);
+
+    await db.run(sql`
+      CREATE TABLE IF NOT EXISTS permissions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+        name TEXT NOT NULL UNIQUE,
+        description TEXT,
+        resource TEXT NOT NULL,
+        action TEXT NOT NULL,
+        created_at INTEGER DEFAULT (strftime('%s', 'now')) NOT NULL
+      )
+    `);
+
+    await db.run(sql`
+      CREATE TABLE IF NOT EXISTS role_permissions (
+        role_id INTEGER NOT NULL,
+        permission_id INTEGER NOT NULL,
+        created_at INTEGER DEFAULT (strftime('%s', 'now')) NOT NULL,
+        PRIMARY KEY (role_id, permission_id),
+        FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE,
+        FOREIGN KEY (permission_id) REFERENCES permissions(id) ON DELETE CASCADE
       )
     `);
 
@@ -59,6 +94,14 @@ async function migrate() {
 
     await db.run(sql`
       CREATE UNIQUE INDEX IF NOT EXISTS refresh_tokens_token_unique ON refresh_tokens(token)
+    `);
+
+    await db.run(sql`
+      CREATE UNIQUE INDEX IF NOT EXISTS roles_name_unique ON roles(name)
+    `);
+
+    await db.run(sql`
+      CREATE UNIQUE INDEX IF NOT EXISTS permissions_name_unique ON permissions(name)
     `);
 
     console.log('\n✅ Migration completed successfully!');
