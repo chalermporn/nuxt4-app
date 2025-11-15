@@ -8,8 +8,8 @@ export const users = sqliteTable('users', {
   password: text('password').notNull(), // hashed password
   name: text('name').notNull(),
   role: text('role', { enum: ['admin', 'user', 'moderator'] }).notNull().default('user'),
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
-  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(strftime('%s', 'now'))`),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(strftime('%s', 'now'))`),
 });
 
 // Refresh tokens table for JWT refresh
@@ -18,7 +18,7 @@ export const refreshTokens = sqliteTable('refresh_tokens', {
   userId: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   token: text('token').notNull().unique(),
   expiresAt: integer('expires_at', { mode: 'timestamp' }).notNull(),
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(strftime('%s', 'now'))`),
 });
 
 // Types
