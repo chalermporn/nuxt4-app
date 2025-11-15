@@ -155,8 +155,8 @@
             </li>
             <li v-if="canManageUsers">
               <NuxtLink
-                to="/dashboard"
-                :class="{ 'active': route.path === '/dashboard' }"
+                to="/user-management"
+                :class="{ 'active': route.path === '/user-management' }"
                 class="gap-3"
                 @click="closeDrawer"
               >
@@ -164,7 +164,6 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
                 User Management
-                <span class="badge badge-sm badge-primary">{{ userCount }}</span>
               </NuxtLink>
             </li>
             <li v-if="canManageUsers">
@@ -306,7 +305,8 @@ const canManageUsers = computed(() => {
 const pageTitle = computed(() => {
   const path = route.path;
   if (path === '/') return 'Home';
-  if (path === '/dashboard') return 'User Management';
+  if (path === '/dashboard') return 'Dashboard Overview';
+  if (path === '/user-management') return 'User Management';
   if (path === '/users') return 'All Users';
   if (path === '/users/roles') return 'Roles & Permissions';
   if (path === '/users/activity') return 'User Activity';
@@ -331,7 +331,7 @@ const closeDrawer = () => {
 
 // Auto-open submenu if on a user management page
 watch(() => route.path, (newPath) => {
-  if (newPath.startsWith('/users') || newPath === '/dashboard') {
+  if (newPath.startsWith('/users') || newPath === '/user-management') {
     isManagementOpen.value = true;
   }
 }, { immediate: true });

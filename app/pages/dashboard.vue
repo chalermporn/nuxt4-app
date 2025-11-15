@@ -1,98 +1,303 @@
 <template>
   <div>
-      <!-- Alerts -->
-      <Transition
-        enter-active-class="transition-all duration-300 ease-out"
-        enter-from-class="opacity-0 -translate-y-2"
-        enter-to-class="opacity-100 translate-y-0"
-        leave-active-class="transition-all duration-200 ease-in"
-        leave-from-class="opacity-100 translate-y-0"
-        leave-to-class="opacity-0 -translate-y-2"
-      >
-        <div v-if="error" role="alert" class="alert alert-error mb-6 shadow-lg border-l-4 border-error">
-          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <span class="font-medium">{{ error }}</span>
-        </div>
-      </Transition>
+    <!-- Alerts -->
+    <Transition
+      enter-active-class="transition-all duration-300 ease-out"
+      enter-from-class="opacity-0 -translate-y-2"
+      enter-to-class="opacity-100 translate-y-0"
+      leave-active-class="transition-all duration-200 ease-in"
+      leave-from-class="opacity-100 translate-y-0"
+      leave-to-class="opacity-0 -translate-y-2"
+    >
+      <div v-if="error" role="alert" class="alert alert-error mb-6 shadow-lg border-l-4 border-error">
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span class="font-medium">{{ error }}</span>
+      </div>
+    </Transition>
 
-      <Transition
-        enter-active-class="transition-all duration-300 ease-out"
-        enter-from-class="opacity-0 -translate-y-2"
-        enter-to-class="opacity-100 translate-y-0"
-        leave-active-class="transition-all duration-200 ease-in"
-        leave-from-class="opacity-100 translate-y-0"
-        leave-to-class="opacity-0 -translate-y-2"
-      >
-        <div v-if="success" role="alert" class="alert alert-success mb-6 shadow-lg border-l-4 border-success">
-          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <span class="font-medium">{{ success }}</span>
-        </div>
-      </Transition>
+    <Transition
+      enter-active-class="transition-all duration-300 ease-out"
+      enter-from-class="opacity-0 -translate-y-2"
+      enter-to-class="opacity-100 translate-y-0"
+      leave-active-class="transition-all duration-200 ease-in"
+      leave-from-class="opacity-100 translate-y-0"
+      leave-to-class="opacity-0 -translate-y-2"
+    >
+      <div v-if="success" role="alert" class="alert alert-success mb-6 shadow-lg border-l-4 border-success">
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span class="font-medium">{{ success }}</span>
+      </div>
+    </Transition>
 
-      <!-- Stats -->
-      <div v-if="canManageUsers && !loading" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <!-- Total Users Card -->
-        <div class="relative bg-linear-to-br from-primary/10 to-primary/5 rounded-2xl p-6 border border-primary/20 overflow-hidden group hover:shadow-lg transition-all duration-300">
-          <div class="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform duration-500"></div>
-          <div class="relative flex items-start justify-between">
+    <!-- Dashboard Content -->
+    <div v-if="canManageUsers && !loading">
+      <!-- Welcome Section -->
+      <div class="mb-8">
+        <h1 class="text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+          Dashboard Overview
+        </h1>
+        <p class="text-base-content/60">
+          Welcome back, {{ user?.name }}! Here's what's happening with your system.
+        </p>
+      </div>
+
+      <!-- Key Metrics Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Total Users -->
+        <div class="stat bg-gradient-to-br from-primary/10 to-primary/5 rounded-2xl border border-primary/20 shadow-lg hover:shadow-xl transition-all">
+          <div class="stat-figure text-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-8 h-8 stroke-current">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+          </div>
+          <div class="stat-title text-base-content/70">Total Users</div>
+          <div class="stat-value text-primary">{{ analytics?.overview?.totalUsers || 0 }}</div>
+          <div class="stat-desc text-base-content/60">All registered accounts</div>
+        </div>
+
+        <!-- Active Sessions -->
+        <div class="stat bg-gradient-to-br from-success/10 to-success/5 rounded-2xl border border-success/20 shadow-lg hover:shadow-xl transition-all">
+          <div class="stat-figure text-success">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-8 h-8 stroke-current">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div class="stat-title text-base-content/70">Active Sessions</div>
+          <div class="stat-value text-success">{{ analytics?.overview?.activeSessions || 0 }}</div>
+          <div class="stat-desc text-base-content/60">Currently logged in</div>
+        </div>
+
+        <!-- New Users Today -->
+        <div class="stat bg-gradient-to-br from-warning/10 to-warning/5 rounded-2xl border border-warning/20 shadow-lg hover:shadow-xl transition-all">
+          <div class="stat-figure text-warning">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-8 h-8 stroke-current">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+          </div>
+          <div class="stat-title text-base-content/70">New Today</div>
+          <div class="stat-value text-warning">{{ analytics?.overview?.newUsersToday || 0 }}</div>
+          <div class="stat-desc text-base-content/60">Joined in last 24h</div>
+        </div>
+
+        <!-- Growth This Week -->
+        <div class="stat bg-gradient-to-br from-info/10 to-info/5 rounded-2xl border border-info/20 shadow-lg hover:shadow-xl transition-all">
+          <div class="stat-figure text-info">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-8 h-8 stroke-current">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            </svg>
+          </div>
+          <div class="stat-title text-base-content/70">This Week</div>
+          <div class="stat-value text-info">{{ analytics?.overview?.newUsersThisWeek || 0 }}</div>
+          <div class="stat-desc text-base-content/60">New users this week</div>
+        </div>
+      </div>
+
+      <!-- Charts and Analytics Row -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- User Growth Trend Chart -->
+        <div class="bg-base-100 rounded-2xl shadow-xl border border-base-300/50 p-6">
+          <div class="flex items-center justify-between mb-6">
             <div>
-              <p class="text-sm font-medium text-base-content/60 mb-2">Total Users</p>
-              <h3 class="text-4xl font-bold text-primary mb-1">{{ users.length }}</h3>
-              <p class="text-xs text-base-content/50">All registered users</p>
+              <h3 class="text-xl font-bold mb-1">User Growth Trend</h3>
+              <p class="text-sm text-base-content/60">Last 7 days registration</p>
             </div>
-            <div class="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-6 h-6 stroke-primary" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
+            <div class="badge badge-primary badge-lg">
+              {{ analytics?.overview?.newUsersThisWeek || 0 }} this week
+            </div>
+          </div>
+
+          <div class="relative h-64">
+            <div v-if="analytics?.growthTrend?.length" class="flex items-end justify-between h-full gap-2">
+              <div
+                v-for="(day, index) in analytics.growthTrend"
+                :key="index"
+                class="flex-1 flex flex-col items-center gap-2 group"
+              >
+                <div class="relative w-full flex items-end justify-center h-full">
+                  <div
+                    class="w-full bg-gradient-to-t from-primary to-primary/50 rounded-t-lg transition-all group-hover:from-primary/80 group-hover:to-primary/30 cursor-pointer relative"
+                    :style="{ height: `${getBarHeight(day.count)}%` }"
+                  >
+                    <div class="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity">
+                      {{ day.count }}
+                    </div>
+                  </div>
+                </div>
+                <div class="text-xs text-base-content/60 mt-2">
+                  {{ formatShortDate(day.date) }}
+                </div>
+              </div>
+            </div>
+            <div v-else class="flex items-center justify-center h-full text-base-content/40">
+              No growth data available
             </div>
           </div>
         </div>
 
-        <!-- Admins Card -->
-        <div class="relative bg-linear-to-br from-error/10 to-error/5 rounded-2xl p-6 border border-error/20 overflow-hidden group hover:shadow-lg transition-all duration-300">
-          <div class="absolute top-0 right-0 w-32 h-32 bg-error/10 rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform duration-500"></div>
-          <div class="relative flex items-start justify-between">
-            <div>
-              <p class="text-sm font-medium text-base-content/60 mb-2">Admins</p>
-              <h3 class="text-4xl font-bold text-error mb-1">{{ users.filter((u: { role: string; }) => u.role === 'admin').length }}</h3>
-              <p class="text-xs text-base-content/50">Full access</p>
-            </div>
-            <div class="w-12 h-12 bg-error/20 rounded-xl flex items-center justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-6 h-6 stroke-error" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-              </svg>
-            </div>
+        <!-- Role Distribution -->
+        <div class="bg-base-100 rounded-2xl shadow-xl border border-base-300/50 p-6">
+          <div class="mb-6">
+            <h3 class="text-xl font-bold mb-1">Role Distribution</h3>
+            <p class="text-sm text-base-content/60">User roles breakdown</p>
           </div>
-        </div>
 
-        <!-- Moderators Card -->
-        <div class="relative bg-linear-to-br from-warning/10 to-warning/5 rounded-2xl p-6 border border-warning/20 overflow-hidden group hover:shadow-lg transition-all duration-300">
-          <div class="absolute top-0 right-0 w-32 h-32 bg-warning/10 rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform duration-500"></div>
-          <div class="relative flex items-start justify-between">
-            <div>
-              <p class="text-sm font-medium text-base-content/60 mb-2">Moderators</p>
-              <h3 class="text-4xl font-bold text-warning mb-1">{{ users.filter((u: { role: string; }) => u.role === 'moderator').length }}</h3>
-              <p class="text-xs text-base-content/50">Can view users</p>
+          <div class="space-y-4">
+            <div
+              v-for="role in analytics?.roleDistribution"
+              :key="role.role"
+              class="space-y-2"
+            >
+              <div class="flex items-center justify-between text-sm">
+                <div class="flex items-center gap-2">
+                  <div :class="getRoleColor(role.role)" class="w-3 h-3 rounded-full"></div>
+                  <span class="font-medium capitalize">{{ role.role }}</span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <span class="text-base-content/60">{{ role.count }} users</span>
+                  <span class="font-bold text-primary">{{ role.percentage }}%</span>
+                </div>
+              </div>
+              <div class="w-full bg-base-300 rounded-full h-2.5">
+                <div
+                  :class="getRoleGradient(role.role)"
+                  class="h-2.5 rounded-full transition-all duration-500"
+                  :style="{ width: `${role.percentage}%` }"
+                ></div>
+              </div>
             </div>
-            <div class="w-12 h-12 bg-warning/20 rounded-xl flex items-center justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-6 h-6 stroke-warning" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-              </svg>
+
+            <!-- Role Legend -->
+            <div class="pt-4 border-t border-base-300 grid grid-cols-3 gap-2">
+              <div
+                v-for="role in analytics?.roleDistribution"
+                :key="role.role"
+                class="flex items-center gap-2"
+              >
+                <div :class="getRoleBadgeClass(role.role)" class="badge badge-sm">
+                  {{ role.role }}
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- User Management Section (Admin/Moderator only) -->
-      <div v-if="canManageUsers" class="bg-base-100 rounded-2xl shadow-xl border border-base-300/50 overflow-hidden">
+      <!-- Recent Users & Activity -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- Recent Users -->
+        <div class="bg-base-100 rounded-2xl shadow-xl border border-base-300/50 overflow-hidden">
+          <div class="p-6 border-b border-base-300">
+            <h3 class="text-xl font-bold mb-1">Recent Users</h3>
+            <p class="text-sm text-base-content/60">Latest registered members</p>
+          </div>
+          <div class="divide-y divide-base-300">
+            <div
+              v-for="recentUser in analytics?.recentUsers?.slice(0, 5)"
+              :key="recentUser.id"
+              class="p-4 hover:bg-base-200/50 transition-colors"
+            >
+              <div class="flex items-center gap-3">
+                <div class="avatar placeholder">
+                  <div class="bg-gradient-to-br from-primary to-secondary text-primary-content rounded-full w-10">
+                    <span class="text-xs font-semibold">{{ recentUser.name?.charAt(0).toUpperCase() }}</span>
+                  </div>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="font-semibold truncate">{{ recentUser.name }}</div>
+                  <div class="text-sm text-base-content/60 truncate">{{ recentUser.email }}</div>
+                </div>
+                <div class="text-right">
+                  <div :class="getRoleBadgeClass(recentUser.role)" class="badge badge-sm mb-1">
+                    {{ recentUser.role }}
+                  </div>
+                  <div class="text-xs text-base-content/50">
+                    {{ formatRelativeDate(recentUser.createdAt) }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- System Health -->
+        <div class="bg-base-100 rounded-2xl shadow-xl border border-base-300/50 overflow-hidden">
+          <div class="p-6 border-b border-base-300">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-xl font-bold mb-1">System Health</h3>
+                <p class="text-sm text-base-content/60">Current system status</p>
+              </div>
+              <div class="badge badge-success badge-lg gap-2">
+                <div class="w-2 h-2 bg-success-content rounded-full animate-pulse"></div>
+                Healthy
+              </div>
+            </div>
+          </div>
+          <div class="p-6 space-y-4">
+            <!-- Active vs Total Users -->
+            <div class="flex items-center justify-between p-4 bg-base-200 rounded-xl">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-success/20 rounded-lg flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <div class="text-sm text-base-content/60">Active Rate</div>
+                  <div class="font-bold">{{ getActiveRate() }}%</div>
+                </div>
+              </div>
+              <div class="text-right">
+                <div class="text-sm text-base-content/60">Sessions</div>
+                <div class="font-semibold">{{ analytics?.overview?.activeSessions }} / {{ analytics?.overview?.totalUsers }}</div>
+              </div>
+            </div>
+
+            <!-- Growth This Month -->
+            <div class="flex items-center justify-between p-4 bg-base-200 rounded-xl">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-info/20 rounded-lg flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-info" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                  </svg>
+                </div>
+                <div>
+                  <div class="text-sm text-base-content/60">Monthly Growth</div>
+                  <div class="font-bold">{{ analytics?.overview?.newUsersThisMonth || 0 }} users</div>
+                </div>
+              </div>
+              <div class="badge badge-info">This Month</div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="grid grid-cols-2 gap-3">
+              <div class="p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                <div class="text-xs text-base-content/60 mb-1">Admins</div>
+                <div class="text-2xl font-bold text-primary">
+                  {{ analytics?.roleDistribution?.find(r => r.role === 'admin')?.count || 0 }}
+                </div>
+              </div>
+              <div class="p-3 bg-warning/5 border border-warning/20 rounded-lg">
+                <div class="text-xs text-base-content/60 mb-1">Moderators</div>
+                <div class="text-2xl font-bold text-warning">
+                  {{ analytics?.roleDistribution?.find(r => r.role === 'moderator')?.count || 0 }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- User Management Section -->
+      <div class="bg-base-100 rounded-2xl shadow-xl border border-base-300/50 overflow-hidden">
         <div class="p-8">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <div>
-              <h2 class="text-3xl font-bold mb-2 bg-linear-to-r from-primary to-secondary bg-clip-text text-transparent">User Management</h2>
+              <h2 class="text-3xl font-bold mb-2 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">User Management</h2>
               <p class="text-sm text-base-content/60">Manage your team members and permissions</p>
             </div>
             <button
@@ -107,14 +312,8 @@
             </button>
           </div>
 
-          <!-- Loading State -->
-          <div v-if="loading" class="flex flex-col items-center justify-center py-12">
-            <span class="loading loading-spinner loading-lg text-primary"></span>
-            <p class="mt-4">Loading users...</p>
-          </div>
-
           <!-- Users Table -->
-          <div v-else-if="users.length > 0" class="overflow-x-auto -mx-8">
+          <div v-if="users.length > 0" class="overflow-x-auto -mx-8">
             <table class="table">
               <thead>
                 <tr class="border-b border-base-300">
@@ -132,7 +331,7 @@
                   <td>
                     <div class="flex items-center gap-3">
                       <div class="avatar placeholder">
-                        <div class="bg-linear-to-br from-primary to-secondary text-primary-content rounded-full w-10 shadow-md flex items-center justify-center">
+                        <div class="bg-gradient-to-br from-primary to-secondary text-primary-content rounded-full w-10 shadow-md flex items-center justify-center">
                           <span class="text-xs font-semibold">{{ u.name?.charAt(0).toUpperCase() }}</span>
                         </div>
                       </div>
@@ -183,25 +382,32 @@
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- No Permission Message -->
-      <div v-else class="bg-base-100 rounded-2xl shadow-xl border border-base-300/50 overflow-hidden">
-        <div class="text-center py-20 px-8">
-          <div class="w-24 h-24 mx-auto mb-6 bg-linear-to-br from-error/20 to-warning/20 rounded-full flex items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-            </svg>
-          </div>
-          <h1 class="text-3xl font-bold mb-3">Access Restricted</h1>
-          <p class="text-base-content/60 mb-8 max-w-md mx-auto">You don't have permission to manage users. Contact your administrator for access.</p>
-          <button @click="handleLogout" class="btn btn-primary gap-2 h-12 px-6 shadow-lg hover:shadow-xl transition-all">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
-            Return to Login
-          </button>
+    <!-- Loading State -->
+    <div v-else-if="loading" class="flex flex-col items-center justify-center py-20">
+      <span class="loading loading-spinner loading-lg text-primary"></span>
+      <p class="mt-4 text-base-content/60">Loading dashboard...</p>
+    </div>
+
+    <!-- No Permission Message -->
+    <div v-else class="bg-base-100 rounded-2xl shadow-xl border border-base-300/50 overflow-hidden">
+      <div class="text-center py-20 px-8">
+        <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-error/20 to-warning/20 rounded-full flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
         </div>
+        <h1 class="text-3xl font-bold mb-3">Access Restricted</h1>
+        <p class="text-base-content/60 mb-8 max-w-md mx-auto">You don't have permission to manage users. Contact your administrator for access.</p>
+        <button @click="handleLogout" class="btn btn-primary gap-2 h-12 px-6 shadow-lg hover:shadow-xl transition-all">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          Return to Login
+        </button>
       </div>
+    </div>
 
     <!-- Create/Edit User Modal -->
     <Transition
@@ -234,7 +440,7 @@
             class="relative w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden bg-white backdrop-blur-md border border-base-300/30"
           >
             <!-- Gradient Header -->
-            <div class="relative bg-linear-to-br from-primary to-secondary p-8 text-primary-content overflow-hidden">
+            <div class="relative bg-gradient-to-br from-primary to-secondary p-8 text-primary-content overflow-hidden">
               <!-- Decorative circles -->
               <div class="absolute -top-8 -right-8 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
               <div class="absolute -bottom-4 -left-4 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
@@ -403,6 +609,7 @@ const router = useRouter();
 const { user, isAuthenticated, logout, fetchWithAuth, initAuth } = useAuth();
 
 const users = ref<any[]>([]);
+const analytics = ref<any>(null);
 const loading = ref(false);
 const modalLoading = ref(false);
 const error = ref('');
@@ -422,17 +629,22 @@ const canManageUsers = computed(() => {
   return user.value?.role === 'admin' || user.value?.role === 'moderator';
 });
 
-const roleBadgeClass = computed(() => {
-  const role = user.value?.role;
-  if (role === 'admin') return 'badge-error';
-  if (role === 'moderator') return 'badge-warning';
-  return 'badge-info';
-});
-
 const getRoleBadgeClass = (role: string) => {
   if (role === 'admin') return 'badge-error';
   if (role === 'moderator') return 'badge-warning';
   return 'badge-info';
+};
+
+const getRoleColor = (role: string) => {
+  if (role === 'admin') return 'bg-error';
+  if (role === 'moderator') return 'bg-warning';
+  return 'bg-info';
+};
+
+const getRoleGradient = (role: string) => {
+  if (role === 'admin') return 'bg-gradient-to-r from-error to-error/70';
+  if (role === 'moderator') return 'bg-gradient-to-r from-warning to-warning/70';
+  return 'bg-gradient-to-r from-info to-info/70';
 };
 
 const formatDate = (date: any) => {
@@ -442,6 +654,49 @@ const formatDate = (date: any) => {
     month: 'short',
     day: 'numeric',
   });
+};
+
+const formatShortDate = (dateStr: string) => {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+};
+
+const formatRelativeDate = (date: any) => {
+  if (!date) return 'N/A';
+  const now = new Date();
+  const past = new Date(date);
+  const diffMs = now.getTime() - past.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffMins < 1) return 'Just now';
+  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays < 7) return `${diffDays}d ago`;
+  return formatDate(date);
+};
+
+const getBarHeight = (count: number) => {
+  if (!analytics.value?.growthTrend) return 0;
+  const maxCount = Math.max(...analytics.value.growthTrend.map((d: any) => d.count), 1);
+  return (count / maxCount) * 100;
+};
+
+const getActiveRate = () => {
+  if (!analytics.value?.overview) return 0;
+  const total = analytics.value.overview.totalUsers || 1;
+  const active = analytics.value.overview.activeSessions || 0;
+  return ((active / total) * 100).toFixed(1);
+};
+
+const fetchAnalytics = async () => {
+  try {
+    const response = await fetchWithAuth<any>('http://localhost:3001/api/analytics/dashboard');
+    analytics.value = response;
+  } catch (err: any) {
+    console.error('Failed to fetch analytics:', err);
+  }
 };
 
 const fetchUsers = async () => {
@@ -475,8 +730,8 @@ const handleCreate = async () => {
 
     success.value = 'User created successfully';
     closeModal();
-    await fetchUsers();
-    
+    await Promise.all([fetchUsers(), fetchAnalytics()]);
+
     setTimeout(() => {
       success.value = '';
     }, 3000);
@@ -520,8 +775,8 @@ const handleUpdate = async () => {
 
     success.value = 'User updated successfully';
     closeModal();
-    await fetchUsers();
-    
+    await Promise.all([fetchUsers(), fetchAnalytics()]);
+
     setTimeout(() => {
       success.value = '';
     }, 3000);
@@ -543,8 +798,8 @@ const deleteUser = async (id: number) => {
     });
 
     success.value = 'User deleted successfully';
-    await fetchUsers();
-    
+    await Promise.all([fetchUsers(), fetchAnalytics()]);
+
     setTimeout(() => {
       success.value = '';
     }, 3000);
@@ -578,12 +833,12 @@ watchEffect(() => {
 // Initialize and fetch data
 onMounted(async () => {
   initAuth();
-  
+
   // Wait a bit for auth to initialize
   await nextTick();
-  
+
   if (isAuthenticated.value && canManageUsers.value) {
-    await fetchUsers();
+    await Promise.all([fetchUsers(), fetchAnalytics()]);
   }
 });
 </script>
