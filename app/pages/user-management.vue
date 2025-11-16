@@ -208,7 +208,7 @@
               <td>
                 <div class="flex items-center gap-3">
                   <div class="avatar placeholder">
-                    <div class="bg-gradient-to-br from-primary to-secondary text-primary-content rounded-full w-10">
+                    <div class="bg-linear-to-br from-primary to-secondary text-primary-content rounded-full w-10 flex justify-center items-center">
                       <span class="text-xs font-semibold">{{ u.name?.charAt(0).toUpperCase() }}</span>
                     </div>
                   </div>
