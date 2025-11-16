@@ -1,7 +1,7 @@
 import { Elysia } from 'elysia';
 import { db } from '../../db';
 import { users, refreshTokens } from '../../db/schema';
-import { sql, count, eq, gte, desc } from 'drizzle-orm';
+import { sql, count, eq, gte, lt, desc, and } from 'drizzle-orm';
 import { jwtConfig, authMiddleware, requireRole } from '../middleware/auth';
 
 export const analyticsRoutes = new Elysia({ prefix: '/analytics' })
@@ -50,7 +50,7 @@ export const analyticsRoutes = new Elysia({ prefix: '/analytics' })
       const activeSessions = await db
         .select({ count: count() })
         .from(refreshTokens)
-        .where(gte(refreshTokens.expiresAt, Math.floor(Date.now() / 1000)));
+        .where(gte(refreshTokens.expiresAt, new Date()));
 
       // Get recent users (last 10)
       const recentUsers = await db
@@ -79,7 +79,10 @@ export const analyticsRoutes = new Elysia({ prefix: '/analytics' })
           .select({ count: count() })
           .from(users)
           .where(
-            sql`${users.createdAt} >= ${date} AND ${users.createdAt} < ${nextDate}`
+            and(
+              gte(users.createdAt, date),
+              lt(users.createdAt, nextDate)
+            )
           );
 
         growthTrend.push({
@@ -160,7 +163,7 @@ export const analyticsRoutes = new Elysia({ prefix: '/analytics' })
   // Get system health stats
   .get('/health', async ({ set }) => {
     try {
-      const now = Math.floor(Date.now() / 1000);
+      const now = new Date();
 
       // Total refresh tokens
       const totalTokens = await db

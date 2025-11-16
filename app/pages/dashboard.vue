@@ -37,7 +37,7 @@
     <div v-if="canManageUsers && !loading">
       <!-- Welcome Section -->
       <div class="mb-8">
-        <h1 class="text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+        <h1 class="text-4xl font-bold mb-2 bg-linear-to-r from-primary to-secondary bg-clip-text text-transparent">
           Dashboard Overview
         </h1>
         <p class="text-base-content/60">
@@ -48,7 +48,7 @@
       <!-- Key Metrics Cards -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <!-- Total Users -->
-        <div class="stat bg-gradient-to-br from-primary/10 to-primary/5 rounded-2xl border border-primary/20 shadow-lg hover:shadow-xl transition-all">
+        <div class="stat bg-linear-to-br from-primary/10 to-primary/5 rounded-2xl border border-primary/20 shadow-lg hover:shadow-xl transition-all">
           <div class="stat-figure text-primary">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-8 h-8 stroke-current">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -60,7 +60,7 @@
         </div>
 
         <!-- Active Sessions -->
-        <div class="stat bg-gradient-to-br from-success/10 to-success/5 rounded-2xl border border-success/20 shadow-lg hover:shadow-xl transition-all">
+        <div class="stat bg-linear-to-br from-success/10 to-success/5 rounded-2xl border border-success/20 shadow-lg hover:shadow-xl transition-all">
           <div class="stat-figure text-success">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-8 h-8 stroke-current">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -72,7 +72,7 @@
         </div>
 
         <!-- New Users Today -->
-        <div class="stat bg-gradient-to-br from-warning/10 to-warning/5 rounded-2xl border border-warning/20 shadow-lg hover:shadow-xl transition-all">
+        <div class="stat bg-linear-to-br from-warning/10 to-warning/5 rounded-2xl border border-warning/20 shadow-lg hover:shadow-xl transition-all">
           <div class="stat-figure text-warning">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-8 h-8 stroke-current">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -84,7 +84,7 @@
         </div>
 
         <!-- Growth This Week -->
-        <div class="stat bg-gradient-to-br from-info/10 to-info/5 rounded-2xl border border-info/20 shadow-lg hover:shadow-xl transition-all">
+        <div class="stat bg-linear-to-br from-info/10 to-info/5 rounded-2xl border border-info/20 shadow-lg hover:shadow-xl transition-all">
           <div class="stat-figure text-info">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-8 h-8 stroke-current">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
@@ -119,8 +119,8 @@
               >
                 <div class="relative w-full flex items-end justify-center h-full">
                   <div
-                    class="w-full bg-gradient-to-t from-primary to-primary/50 rounded-t-lg transition-all group-hover:from-primary/80 group-hover:to-primary/30 cursor-pointer relative"
-                    :style="{ height: `${getBarHeight(day.count)}%` }"
+                    class="w-full bg-linear-to-t from-primary to-primary/50 rounded-t-lg transition-all group-hover:from-primary/80 group-hover:to-primary/30 cursor-pointer relative"
+                    :style="{ height: `${getBarHeight(day.count)}%` }">
                   >
                     <div class="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity">
                       {{ day.count }}
@@ -202,7 +202,7 @@
             >
               <div class="flex items-center gap-3">
                 <div class="avatar placeholder">
-                  <div class="bg-gradient-to-br from-primary to-secondary text-primary-content rounded-full w-10">
+                  <div class="bg-linear-to-br from-primary to-secondary text-primary-content rounded-full w-10 flex items-center justify-center shadow-md">
                     <span class="text-xs font-semibold">{{ recentUser.name?.charAt(0).toUpperCase() }}</span>
                   </div>
                 </div>
@@ -278,13 +278,13 @@
               <div class="p-3 bg-primary/5 border border-primary/20 rounded-lg">
                 <div class="text-xs text-base-content/60 mb-1">Admins</div>
                 <div class="text-2xl font-bold text-primary">
-                  {{ analytics?.roleDistribution?.find(r => r.role === 'admin')?.count || 0 }}
+                  {{ analytics?.roleDistribution?.find((r: any) => r.role === 'admin')?.count || 0 }}
                 </div>
               </div>
               <div class="p-3 bg-warning/5 border border-warning/20 rounded-lg">
                 <div class="text-xs text-base-content/60 mb-1">Moderators</div>
                 <div class="text-2xl font-bold text-warning">
-                  {{ analytics?.roleDistribution?.find(r => r.role === 'moderator')?.count || 0 }}
+                  {{ analytics?.roleDistribution?.find((r: any) => r.role === 'moderator')?.count || 0 }}
                 </div>
               </div>
             </div>
@@ -297,7 +297,7 @@
         <div class="p-8">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <div>
-              <h2 class="text-3xl font-bold mb-2 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">User Management</h2>
+              <h2 class="text-3xl font-bold mb-2 bg-linear-to-r from-primary to-secondary bg-clip-text text-transparent">User Management</h2>
               <p class="text-sm text-base-content/60">Manage your team members and permissions</p>
             </div>
             <button
@@ -331,7 +331,7 @@
                   <td>
                     <div class="flex items-center gap-3">
                       <div class="avatar placeholder">
-                        <div class="bg-gradient-to-br from-primary to-secondary text-primary-content rounded-full w-10 shadow-md flex items-center justify-center">
+                        <div class="bg-linear-to-br from-primary to-secondary text-primary-content rounded-full w-10 shadow-md flex items-center justify-center">
                           <span class="text-xs font-semibold">{{ u.name?.charAt(0).toUpperCase() }}</span>
                         </div>
                       </div>
@@ -393,7 +393,7 @@
     <!-- No Permission Message -->
     <div v-else class="bg-base-100 rounded-2xl shadow-xl border border-base-300/50 overflow-hidden">
       <div class="text-center py-20 px-8">
-        <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-error/20 to-warning/20 rounded-full flex items-center justify-center">
+        <div class="w-24 h-24 mx-auto mb-6 bg-linear-to-br from-error/20 to-warning/20 rounded-full flex items-center justify-center">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
           </svg>
@@ -440,7 +440,7 @@
             class="relative w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden bg-white backdrop-blur-md border border-base-300/30"
           >
             <!-- Gradient Header -->
-            <div class="relative bg-gradient-to-br from-primary to-secondary p-8 text-primary-content overflow-hidden">
+            <div class="relative bg-linear-to-br from-primary to-secondary p-8 text-primary-content overflow-hidden">
               <!-- Decorative circles -->
               <div class="absolute -top-8 -right-8 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
               <div class="absolute -bottom-4 -left-4 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
