@@ -399,7 +399,7 @@
           <div v-if="viewingUser" class="p-8 space-y-6">
             <div class="flex items-center gap-6">
               <div class="avatar placeholder">
-                <div class="bg-gradient-to-br from-primary to-secondary text-primary-content rounded-full w-24">
+                <div class="bg-gradient-to-br from-primary to-secondary text-primary-content rounded-full w-24 flex justify-center items-center shadow-lg">
                   <span class="text-3xl font-semibold">{{ viewingUser.name?.charAt(0).toUpperCase() }}</span>
                 </div>
               </div>

@@ -293,7 +293,7 @@
       </div>
 
       <!-- User Management Section -->
-      <div class="bg-base-100 rounded-2xl shadow-xl border border-base-300/50 overflow-hidden">
+      <div class="bg-base-100 rounded-2xl shadow-xl border border-base-300/50 overflow-hidden hidden">
         <div class="p-8">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <div>
