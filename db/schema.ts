@@ -8,6 +8,8 @@ export const users = sqliteTable('users', {
   password: text('password').notNull(), // hashed password
   name: text('name').notNull(),
   role: text('role', { enum: ['admin', 'user', 'moderator'] }).notNull().default('user'),
+  phone: text('phone'),
+  bio: text('bio'),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(strftime('%s', 'now'))`),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(strftime('%s', 'now'))`),
 });

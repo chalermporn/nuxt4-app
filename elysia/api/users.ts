@@ -1,8 +1,8 @@
 import { Elysia, t } from 'elysia';
 import { db } from '../../db';
 import { users } from '../../db/schema';
-import { eq, ne, desc } from 'drizzle-orm';
-import { hash } from 'bcrypt';
+import { eq, ne, desc, sql } from 'drizzle-orm';
+import { hash, compare } from 'bcrypt';
 import { jwtConfig, authMiddleware, requireRole } from '../middleware/auth';
 
 const SALT_ROUNDS = 10;
@@ -242,7 +242,143 @@ const adminOnlyRoutes = new Elysia()
     }
   );
 
+// Routes accessible by authenticated users (for their own profile)
+const userProfileRoutes = new Elysia()
+  .use(jwtConfig)
+  .use(authMiddleware)
+
+  // Get own profile
+  .get('/me', async ({ user }) => {
+    try {
+      const currentUser = await db.query.users.findFirst({
+        where: eq(users.id, user.id),
+        columns: {
+          password: false, // Exclude password
+        },
+      });
+
+      if (!currentUser) {
+        return { error: 'User not found' };
+      }
+
+      return { user: currentUser };
+    } catch (error) {
+      return { error: 'Failed to fetch profile' };
+    }
+  })
+
+  // Update own profile
+  .patch(
+    '/me',
+    async ({ user, body, set }) => {
+      try {
+        // Check for email conflicts
+        if (body.email && body.email !== user.email) {
+          const emailConflict = await db.query.users.findFirst({
+            where: eq(users.email, body.email),
+          });
+
+          if (emailConflict) {
+            set.status = 400;
+            return { error: 'Email already in use' };
+          }
+        }
+
+        // Prepare update data
+        const updateData: any = {};
+        if (body.email) updateData.email = body.email;
+        if (body.name) updateData.name = body.name;
+        if (body.phone !== undefined) updateData.phone = body.phone;
+        if (body.bio !== undefined) updateData.bio = body.bio;
+        updateData.updatedAt = sql`(strftime('%s', 'now'))`;
+
+        // Update user
+        const [updatedUser] = await db
+          .update(users)
+          .set(updateData)
+          .where(eq(users.id, user.id))
+          .returning({
+            id: users.id,
+            email: users.email,
+            name: users.name,
+            role: users.role,
+            phone: users.phone,
+            bio: users.bio,
+            createdAt: users.createdAt,
+            updatedAt: users.updatedAt,
+          });
+
+        return {
+          message: 'Profile updated successfully',
+          user: updatedUser,
+        };
+      } catch (error) {
+        set.status = 500;
+        return { error: 'Failed to update profile' };
+      }
+    },
+    {
+      body: t.Object({
+        email: t.Optional(t.String({ format: 'email' })),
+        name: t.Optional(t.String({ minLength: 2 })),
+        phone: t.Optional(t.String()),
+        bio: t.Optional(t.String()),
+      }),
+    }
+  )
+
+  // Change own password
+  .post(
+    '/me/change-password',
+    async ({ user, body, set }) => {
+      try {
+        // Get current user with password
+        const currentUser = await db.query.users.findFirst({
+          where: eq(users.id, user.id),
+        });
+
+        if (!currentUser) {
+          set.status = 404;
+          return { error: 'User not found' };
+        }
+
+        // Verify current password
+        const isValid = await compare(body.currentPassword, currentUser.password);
+        if (!isValid) {
+          set.status = 400;
+          return { error: 'Current password is incorrect' };
+        }
+
+        // Hash new password
+        const hashedPassword = await hash(body.newPassword, SALT_ROUNDS);
+
+        // Update password
+        await db
+          .update(users)
+          .set({
+            password: hashedPassword,
+            updatedAt: sql`(strftime('%s', 'now'))`,
+          })
+          .where(eq(users.id, user.id));
+
+        return {
+          message: 'Password changed successfully',
+        };
+      } catch (error) {
+        set.status = 500;
+        return { error: 'Failed to change password' };
+      }
+    },
+    {
+      body: t.Object({
+        currentPassword: t.String({ minLength: 6 }),
+        newPassword: t.String({ minLength: 6 }),
+      }),
+    }
+  );
+
 // Combine all routes
 export const usersRoutes = new Elysia({ prefix: '/users' })
+  .use(userProfileRoutes)
   .use(adminModeratorRoutes)
   .use(adminOnlyRoutes);

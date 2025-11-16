@@ -3,6 +3,10 @@ export interface User {
   email: string;
   name: string;
   role: string;
+  phone?: string;
+  bio?: string;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
 }
 
 export interface AuthTokens {
@@ -150,6 +154,18 @@ export const useAuth = () => {
     }
   };
 
+  // Update user data
+  const updateUserData = (updatedUser: Partial<User>) => {
+    if (user.value) {
+      user.value = { ...user.value, ...updatedUser };
+      
+      // Update localStorage
+      if (process.client) {
+        localStorage.setItem('user', JSON.stringify(user.value));
+      }
+    }
+  };
+
   // Fetch with auth header
   const fetchWithAuth = async <T>(url: string, options: any = {}) => {
     if (!accessToken.value) {
@@ -195,6 +211,7 @@ export const useAuth = () => {
     refresh,
     logout,
     initAuth,
+    updateUserData,
     fetchWithAuth,
   };
 };
