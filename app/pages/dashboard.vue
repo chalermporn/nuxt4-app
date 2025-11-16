@@ -111,26 +111,10 @@
           </div>
 
           <div class="relative h-64">
-            <div v-if="analytics?.growthTrend?.length" class="flex items-end justify-between h-full gap-2">
-              <div
-                v-for="(day, index) in analytics.growthTrend"
-                :key="index"
-                class="flex-1 flex flex-col items-center gap-2 group"
-              >
-                <div class="relative w-full flex items-end justify-center h-full">
-                  <div
-                    class="w-full bg-linear-to-t from-primary to-primary/50 rounded-t-lg transition-all group-hover:from-primary/80 group-hover:to-primary/30 cursor-pointer relative"
-                    :style="{ height: `${getBarHeight(day.count)}%` }">
-                  >
-                    <div class="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity">
-                      {{ day.count }}
-                    </div>
-                  </div>
-                </div>
-                <div class="text-xs text-base-content/60 mt-2">
-                  {{ formatShortDate(day.date) }}
-                </div>
-              </div>
+            <div v-if="analytics?.growthTrend?.length" class="h-full">
+              <ClientOnly>
+                <Line :data="chartData" :options="chartOptions" />
+              </ClientOnly>
             </div>
             <div v-else class="flex items-center justify-center h-full text-base-content/40">
               No growth data available
@@ -600,6 +584,29 @@
 
 <script setup lang="ts">
 import { useAuth } from '~/composables/useAuth';
+import { Line } from 'vue-chartjs';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+} from 'chart.js';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+);
 
 definePageMeta({
   layout: 'dashboard'
@@ -649,7 +656,9 @@ const getRoleGradient = (role: string) => {
 
 const formatDate = (date: any) => {
   if (!date) return 'N/A';
-  return new Date(date).toLocaleDateString('en-US', {
+  // Convert Unix timestamp (seconds) to milliseconds for JavaScript Date
+  const timestamp = typeof date === 'number' ? date * 1000 : date;
+  return new Date(timestamp).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
@@ -661,10 +670,80 @@ const formatShortDate = (dateStr: string) => {
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 };
 
+const chartData = computed(() => {
+  if (!analytics.value?.growthTrend?.length) return { labels: [], datasets: [] };
+  
+  return {
+    labels: analytics.value.growthTrend.map((day: any) => formatShortDate(day.date)),
+    datasets: [
+      {
+        label: 'New Users',
+        data: analytics.value.growthTrend.map((day: any) => day.count),
+        borderColor: 'rgb(96, 165, 250)',
+        backgroundColor: 'rgba(96, 165, 250, 0.1)',
+        fill: true,
+        tension: 0.4,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        pointBackgroundColor: 'rgb(96, 165, 250)',
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+      }
+    ]
+  };
+});
+
+const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      display: false
+    },
+    tooltip: {
+      backgroundColor: 'rgb(96, 165, 250)',
+      titleColor: '#fff',
+      bodyColor: '#fff',
+      padding: 12,
+      cornerRadius: 8,
+      displayColors: false,
+      callbacks: {
+        label: function(context: any) {
+          return `${context.parsed.y} users`;
+        }
+      }
+    }
+  },
+  scales: {
+    y: {
+      beginAtZero: true,
+      ticks: {
+        precision: 0,
+        color: 'rgba(0, 0, 0, 0.5)'
+      },
+      grid: {
+        color: 'rgba(0, 0, 0, 0.05)',
+        drawBorder: false
+      }
+    },
+    x: {
+      ticks: {
+        color: 'rgba(0, 0, 0, 0.5)'
+      },
+      grid: {
+        display: false,
+        drawBorder: false
+      }
+    }
+  }
+};
+
 const formatRelativeDate = (date: any) => {
   if (!date) return 'N/A';
+  // Convert Unix timestamp (seconds) to milliseconds for JavaScript Date
+  const timestamp = typeof date === 'number' ? date * 1000 : date;
   const now = new Date();
-  const past = new Date(date);
+  const past = new Date(timestamp);
   const diffMs = now.getTime() - past.getTime();
   const diffMins = Math.floor(diffMs / 60000);
   const diffHours = Math.floor(diffMs / 3600000);
@@ -675,12 +754,6 @@ const formatRelativeDate = (date: any) => {
   if (diffHours < 24) return `${diffHours}h ago`;
   if (diffDays < 7) return `${diffDays}d ago`;
   return formatDate(date);
-};
-
-const getBarHeight = (count: number) => {
-  if (!analytics.value?.growthTrend) return 0;
-  const maxCount = Math.max(...analytics.value.growthTrend.map((d: any) => d.count), 1);
-  return (count / maxCount) * 100;
 };
 
 const getActiveRate = () => {

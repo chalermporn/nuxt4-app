@@ -40,12 +40,15 @@
     "@elysiajs/jwt": "^1.4.0",
     "@elysiajs/openapi": "^1.4.11",
     "@elysiajs/swagger": "^1.3.1",
+    "@nuxt/ui": "^4.1.0",
     "@tailwindcss/vite": "^4.1.17",
     "bcrypt": "^6.0.0",
+    "chart.js": "^4.5.1",
     "drizzle-orm": "^0.44.7",
     "elysia": "^1.4.15",
     "nuxt": "^4.2.1",
     "vue": "^3.5.22",
+    "vue-chartjs": "^5.3.3",
     "vue-router": "^4.6.3"
   },
   "devDependencies": {
