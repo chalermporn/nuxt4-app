@@ -39,6 +39,8 @@ async function migrate() {
         password TEXT NOT NULL,
         name TEXT NOT NULL,
         role TEXT DEFAULT 'user' NOT NULL,
+        phone TEXT,
+        bio TEXT,
         created_at INTEGER DEFAULT (strftime('%s', 'now')) NOT NULL,
         updated_at INTEGER DEFAULT (strftime('%s', 'now')) NOT NULL
       )

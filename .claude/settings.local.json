@@ -9,7 +9,8 @@
       "Bash(curl:*)",
       "Bash(sqlite3:*)",
       "Bash(lsof:*)",
-      "Bash(xargs kill:*)"
+      "Bash(xargs kill:*)",
+      "Bash(rm:*)"
     ],
     "deny": [],
     "ask": []
