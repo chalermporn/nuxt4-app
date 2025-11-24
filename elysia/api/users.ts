@@ -23,6 +23,7 @@ const adminModeratorRoutes = new Elysia()
           name: users.name,
           role: users.role,
           createdAt: users.createdAt,
+          updatedAt: users.updatedAt,
         })
         .from(users)
         .orderBy(desc(users.createdAt));
