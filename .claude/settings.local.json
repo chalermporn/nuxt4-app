@@ -10,7 +10,8 @@
       "Bash(sqlite3:*)",
       "Bash(lsof:*)",
       "Bash(xargs kill:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "mcp__ide__getDiagnostics"
     ],
     "deny": [],
     "ask": []
